@@ -50,6 +50,7 @@ Hệ thống xử lý dữ liệu lớn (Big Data / Data Warehousing) và phát 
 │   └── test_preprocessing.py
 │
 ├── .gitignore               # Cấu hình bỏ qua tệp dữ liệu lớn (>500MB)
+├── requirements.txt         # Khai báo các thư viện phụ thuộc (Dependencies)
 ├── RAW_DATA_ANALYSIS.md     # Bản phân tích dữ liệu thô (gốc)
 ├── PENTAHO_ETL_PLAN.md      # Kế hoạch ETL Pentaho (gốc)
 ├── PREPROCESSING_PROCESS.md # Quy trình tiền xử lý dữ liệu & Hướng dẫn chạy (gốc)
@@ -107,7 +108,12 @@ git push -u origin main
 
 ---
 
-## 4. HƯỚNG DẪN CHẠY MODULE TIỀN XỬ LÝ (PREPROCESSING EXECUTION)
+## 4. HƯỚNG DẪN CÀI ĐẶT & CHẠY MODULE TIỀN XỬ LÝ (SETUP & EXECUTION)
+
+### Cài đặt thư viện phụ thuộc:
+```bash
+pip install -r requirements.txt
+```
 
 ### Chạy Unit Test kiểm tra tính đúng đắn của bộ lọc:
 ```bash
