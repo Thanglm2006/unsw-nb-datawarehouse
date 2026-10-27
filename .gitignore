@@ -1,0 +1,71 @@
+# ==============================================================================
+# DATASET IGNORE (CRITICAL: Do NOT commit large raw & processed data to Git)
+# ==============================================================================
+data/raw/*.csv
+data/processed/*
+!data/processed/.gitkeep
+*.csv.gz
+*.parquet
+*.dump
+*.tar.gz
+
+# Retain lightweight schema metadata
+!data/metadata/NUSW-NB15_features.csv
+!data/metadata/UNSW-NB15_LIST_EVENTS.csv
+
+# ==============================================================================
+# PYTHON ENVIRONMENT & CACHE
+# ==============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# ==============================================================================
+# PENTAHO DATA INTEGRATION (PDI / KETTLE)
+# ==============================================================================
+.kettle/
+*.log
+kettle.log
+pentaho_logs/
+
+# ==============================================================================
+# IDE & SYSTEM ARTIFACTS
+# ==============================================================================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
