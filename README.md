@@ -25,7 +25,9 @@ Hệ thống xử lý dữ liệu lớn (Big Data / Data Warehousing) và phát 
 ├── docs/                    # Tài liệu kỹ thuật dự án
 │   ├── RAW_DATA_ANALYSIS.md       # Báo cáo phân tích sâu dữ liệu thô
 │   ├── PENTAHO_ETL_PLAN.md        # Kế hoạch & Guide thiết kế Pentaho PDI
-│   └── PREPROCESSING_PLAN.md      # Kế hoạch triển khai module làm sạch dữ liệu
+│   ├── PREPROCESSING_PROCESS.md   # Quy trình chi tiết & cách chạy tiền xử lý
+│   ├── before_after_preprocessing.png # Biểu đồ so sánh Trước vs Sau xử lý
+│   └── cleaned_data_overview.png  # Biểu đồ tổng quan đặc tính dữ liệu sạch
 │
 ├── pentaho/                 # Các artifacts của Pentaho Data Integration (PDI)
 │   ├── jobs/                # Các file Master Job (*.kjb)
@@ -40,7 +42,8 @@ Hệ thống xử lý dữ liệu lớn (Big Data / Data Warehousing) và phát 
 ├── src/                     # Mã nguồn Backend & ETL Pipeline
 │   ├── preprocessing/       # Module làm sạch dữ liệu tự động
 │   │   ├── __init__.py
-│   │   └── cleaner.py       # Pipeline xử lý Hex port, Impute, Datetime, String
+│   │   ├── cleaner.py       # Pipeline xử lý Hex port, Impute, Datetime, String
+│   │   └── plotter.py       # Module trực quan hóa Before/After & Cleaned Data
 │   └── database/            # Quản lý kết nối Database
 │
 ├── tests/                   # Bộ kiểm thử tự động (Unit Tests)
@@ -49,7 +52,7 @@ Hệ thống xử lý dữ liệu lớn (Big Data / Data Warehousing) và phát 
 ├── .gitignore               # Cấu hình bỏ qua tệp dữ liệu lớn (>500MB)
 ├── RAW_DATA_ANALYSIS.md     # Bản phân tích dữ liệu thô (gốc)
 ├── PENTAHO_ETL_PLAN.md      # Kế hoạch ETL Pentaho (gốc)
-├── PREPROCESSING_PLAN.md    # Kế hoạch tiền xử lý dữ liệu (gốc)
+├── PREPROCESSING_PROCESS.md # Quy trình tiền xử lý dữ liệu & Hướng dẫn chạy (gốc)
 └── README.md                # Tài liệu tổng quan & Hướng dẫn vận hành
 ```
 
@@ -59,7 +62,7 @@ Hệ thống xử lý dữ liệu lớn (Big Data / Data Warehousing) và phát 
 
 1. **[RAW_DATA_ANALYSIS.md](RAW_DATA_ANALYSIS.md)**: Phân tích chi tiết quy mô 2.54M dòng, mất cân bằng nhãn (87.35% Normal vs 12.65% Attack), ô nhiễm kiểu dữ liệu ở cổng (`sport`, `dsport` chứa Hex `0x000b` và `-`), dữ liệu khuyết HTTP/FTP (53% - 56%), và chuỗi nhãn không đồng nhất.
 2. **[PENTAHO_ETL_PLAN.md](PENTAHO_ETL_PLAN.md)**: Thiết kế luồng Master Job (`jb_master_unsw_dw.kjb`) và 3 Transformation tuần tự (`tr_staging_clean_raw.ktr`, `tr_load_dimensions.ktr`, `tr_load_fact_flow.ktr`), kèm cấu hình chi tiết từng Step và phương pháp tối ưu In-memory caching.
-3. **[PREPROCESSING_PLAN.md](PREPROCESSING_PLAN.md)**: Ma trận chuyển đổi dữ liệu và 4 giai đoạn triển khai module làm sạch tự động.
+3. **[PREPROCESSING_PROCESS.md](PREPROCESSING_PROCESS.md)**: Quy trình tiền xử lý dữ liệu chi tiết, phân tích kỹ thuật từng bước chuyển đổi và hướng dẫn các cách chạy pipeline và biểu đồ.
 
 ---
 
@@ -116,7 +119,15 @@ python3 -m unittest tests/test_preprocessing.py
 # Sử dụng môi trường ảo venv có sẵn
 ~/venv/bin/python -m src.preprocessing.cleaner
 ```
-Kết quả được xuất ra định dạng nén Parquet hiệu năng cao tại: `data/processed/`.
+Kết quả được xuất ra định dạng nén Parquet hiệu năng cao tại: `data/processed/unsw_nb15_cleaned.parquet`.
+
+### Chạy Module sinh biểu đồ phân tích (Plotter):
+```bash
+~/venv/bin/python -m src.preprocessing.plotter
+```
+Sinh tự động 2 biểu đồ phân tích chất lượng dữ liệu:
+* `docs/before_after_preprocessing.png`: Biểu đồ so sánh Trước vs Sau khi tiền xử lý.
+* `docs/cleaned_data_overview.png`: Biểu đồ phân tích tổng quan đặc tính tập dữ liệu sạch.
 
 ---
 
