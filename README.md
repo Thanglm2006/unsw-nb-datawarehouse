@@ -107,10 +107,12 @@ Sinh tự động 2 biểu đồ phân tích chất lượng dữ liệu:
 
 ---
 
-## 5. KHỞI TẠO CƠ SỞ DỮ LIỆU KHO DỮ LIỆU (SQL DDL)
+## 5. CẤU TRÚC BẢNG ĐÍCH TRONG KHO DỮ LIỆU CHO PENTAHO (TARGET DW SCHEMA)
 
-Đăng nhập vào PostgreSQL và chạy tuần tự 2 script:
-```bash
-psql -U <username> -d <database_name> -f sql/01_staging_tables.sql
-psql -U <username> -d <database_name> -f sql/02_star_schema_ddl.sql
-```
+Pentaho Data Integration (PDI) là công cụ ETL đóng vai trò trích xuất và biến đổi dữ liệu. Dữ liệu sau khi qua Pentaho sẽ được **nạp vào Cơ sở dữ liệu đích (Target Database / Data Warehouse)** thông qua kết nối **JDBC** trong step `Table Output`.
+
+Các kịch bản DDL trong thư mục `sql/` được sử dụng để khởi tạo cấu trúc bảng trên CSDL đích trước khi chạy Pentaho:
+* [sql/01_staging_tables.sql](sql/01_staging_tables.sql): Bảng trung gian `stg_network_flow` (cho Transformation 1).
+* [sql/02_star_schema_ddl.sql](sql/02_star_schema_ddl.sql): Mô hình hình sao 5 bảng Dimension và bảng Fact `fact_network_flow` (cho Transformation 2 & 3).
+
+*(Bạn có thể import các file `.sql` này vào hệ quản trị CSDL đích của bạn như PostgreSQL/MySQL mà Pentaho trỏ tới).*
