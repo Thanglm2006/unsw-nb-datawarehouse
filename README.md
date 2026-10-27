@@ -67,43 +67,13 @@ Hệ thống xử lý dữ liệu lớn (Big Data / Data Warehousing) và phát 
 
 ---
 
-## 3. HƯỚNG DẪN KHỞI TẠO GIT REPOSITORY (GIT REPO SETUP GUIDE)
+## 3. HƯỚNG DẪN CLONE REPOSITORY (CLONE REPO)
 
-Dự án đã được cấu hình `.gitignore` chuẩn nhằm tự động loại bỏ các tệp CSV dung lượng lớn (`data/raw/*.csv` ~586 MB) và các tệp cache/tạm thời, đảm bảo Git repository nhẹ và chuẩn CI/CD.
+Để tải toàn bộ mã nguồn dự án về máy:
 
-Thực hiện các bước sau trong terminal để khởi tạo kho mã nguồn Git:
-
-### Bước 1: Khởi tạo Git repository nội bộ
 ```bash
-cd /home/thanglm2006/DW
-git init
-```
-
-### Bước 2: Kiểm tra trạng thái tệp (Đảm bảo CSV lớn đã được ignore)
-```bash
-git status
-```
-*Bạn sẽ thấy các thư mục `docs/`, `src/`, `sql/`, `tests/`, `data/metadata/`, `.gitignore` hiển thị màu xanh/đỏ, trong khi các file `.csv` lớn trong `data/raw/` hoàn toàn không xuất hiện.*
-
-### Bước 3: Thêm toàn bộ mã nguồn vào staging và tạo Commit đầu tiên
-```bash
-git add .
-git commit -m "feat: initial commit - DW project structure, preprocessing pipeline, SQL schemas, and ETL docs"
-```
-
-### Bước 4: Đổi tên nhánh mặc định thành `main`
-```bash
-git branch -M main
-```
-
-### Bước 5: Kết nối với Git Remote (GitHub / GitLab / Bitbucket)
-Tạo một repository mới trên GitHub (hoặc GitLab), sau đó chạy các lệnh sau (thay URL bằng repo của bạn):
-```bash
-# Thêm địa chỉ remote origin
-git remote add origin https://github.com/<your-username>/<your-repo-name>.git
-
-# Đẩy toàn bộ mã nguồn lên nhánh chính
-git push -u origin main
+git clone https://github.com/Thanglm2006/unsw-nb-datawarehouse.git
+cd unsw-nb-datawarehouse
 ```
 
 ---
