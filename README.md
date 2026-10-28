@@ -174,10 +174,19 @@ Mở `http://localhost:5175`.
 API base URL cấu hình tại `frontend/.env`:
 
 ```env
-VITE_API_BASE_URL=
+VITE_API_BASE_URL=https://dw-api.caelestial.store
 ```
 
-Khi chạy local, để trống để Vite proxy tới `http://localhost:8009`. Khi deploy khác domain, đặt URL API tương ứng.
+Khi chạy local không tunnel, đặt `VITE_API_BASE_URL=` để Vite proxy tới `http://localhost:8009`. Khi tunnel frontend, dùng `https://dw-api.caelestial.store`.
+
+Với tunnel hiện tại:
+
+```text
+Frontend: https://dw.caelestial.store
+Backend:  https://dw-api.caelestial.store
+```
+
+`FRONTEND_ORIGINS` đã cho phép cả `http://localhost:5175` và `https://dw.caelestial.store` để dùng được local lẫn tunnel.
 
 Frontend gồm:
 

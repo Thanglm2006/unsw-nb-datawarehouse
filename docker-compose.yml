@@ -24,7 +24,7 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_URL: postgresql://unsw:unsw_password@postgres:5432/unsw_dw
-      FRONTEND_ORIGINS: ${FRONTEND_ORIGIN:-http://localhost:5175}
+      FRONTEND_ORIGINS: ${FRONTEND_ORIGINS:-http://localhost:5175,https://dw.caelestial.store}
     ports:
       - "${BACKEND_PORT:-8009}:8000"
     depends_on:

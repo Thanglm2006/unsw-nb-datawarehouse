@@ -40,7 +40,7 @@ VITE_API_BASE_URL=
 Chạy frontend với backend ở domain khác:
 
 ```env
-VITE_API_BASE_URL=https://api.example.com
+VITE_API_BASE_URL=https://dw-api.caelestial.store
 ```
 
 ## Các page
