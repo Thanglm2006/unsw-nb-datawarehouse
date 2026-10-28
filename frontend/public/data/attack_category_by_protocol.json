@@ -1,0 +1,83 @@
+{
+  "protocols": [
+    "udp",
+    "tcp",
+    "unas",
+    "ospf",
+    "sctp"
+  ],
+  "data": [
+    {
+      "category": "Analysis",
+      "udp": 0,
+      "tcp": 622,
+      "unas": 926,
+      "ospf": 75,
+      "sctp": 26
+    },
+    {
+      "category": "Backdoor",
+      "udp": 34,
+      "tcp": 323,
+      "unas": 806,
+      "ospf": 162,
+      "sctp": 69
+    },
+    {
+      "category": "DoS",
+      "udp": 527,
+      "tcp": 3336,
+      "unas": 5246,
+      "ospf": 944,
+      "sctp": 426
+    },
+    {
+      "category": "Exploits",
+      "udp": 874,
+      "tcp": 27443,
+      "unas": 6532,
+      "ospf": 1504,
+      "sctp": 739
+    },
+    {
+      "category": "Fuzzers",
+      "udp": 6043,
+      "tcp": 15474,
+      "unas": 1132,
+      "ospf": 210,
+      "sctp": 76
+    },
+    {
+      "category": "Generic",
+      "udp": 210600,
+      "tcp": 3118,
+      "unas": 720,
+      "ospf": 154,
+      "sctp": 76
+    },
+    {
+      "category": "Reconnaissance",
+      "udp": 4890,
+      "tcp": 6965,
+      "unas": 840,
+      "ospf": 229,
+      "sctp": 113
+    },
+    {
+      "category": "Shellcode",
+      "udp": 761,
+      "tcp": 750,
+      "unas": 0,
+      "ospf": 0,
+      "sctp": 0
+    },
+    {
+      "category": "Worms",
+      "udp": 21,
+      "tcp": 153,
+      "unas": 0,
+      "ospf": 0,
+      "sctp": 0
+    }
+  ]
+}

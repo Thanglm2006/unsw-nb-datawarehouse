@@ -1,0 +1,42 @@
+[
+  {
+    "category": "Normal",
+    "count": 2218764
+  },
+  {
+    "category": "Generic",
+    "count": 215481
+  },
+  {
+    "category": "Exploits",
+    "count": 44525
+  },
+  {
+    "category": "Fuzzers",
+    "count": 24246
+  },
+  {
+    "category": "DoS",
+    "count": 16353
+  },
+  {
+    "category": "Reconnaissance",
+    "count": 13987
+  },
+  {
+    "category": "Analysis",
+    "count": 2677
+  },
+  {
+    "category": "Backdoor",
+    "count": 2329
+  },
+  {
+    "category": "Shellcode",
+    "count": 1511
+  },
+  {
+    "category": "Worms",
+    "count": 174
+  }
+]

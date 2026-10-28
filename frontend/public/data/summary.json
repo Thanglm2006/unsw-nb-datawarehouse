@@ -1,0 +1,23 @@
+{
+  "total_records": 2540047,
+  "attack_count": 321283,
+  "normal_count": 2218764,
+  "attack_percent": 12.65,
+  "normal_percent": 87.35,
+  "unique_source_ips": 43,
+  "unique_dest_ips": 47,
+  "unique_protocols": 135,
+  "unique_services": 13,
+  "attack_categories": [
+    "Analysis",
+    "Backdoor",
+    "DoS",
+    "Exploits",
+    "Fuzzers",
+    "Generic",
+    "Normal",
+    "Reconnaissance",
+    "Shellcode",
+    "Worms"
+  ]
+}

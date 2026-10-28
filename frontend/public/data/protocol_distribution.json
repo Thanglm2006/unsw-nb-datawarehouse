@@ -1,0 +1,62 @@
+[
+  {
+    "protocol": "tcp",
+    "count": 1495074
+  },
+  {
+    "protocol": "udp",
+    "count": 990435
+  },
+  {
+    "protocol": "unas",
+    "count": 16202
+  },
+  {
+    "protocol": "arp",
+    "count": 10064
+  },
+  {
+    "protocol": "ospf",
+    "count": 7798
+  },
+  {
+    "protocol": "sctp",
+    "count": 1525
+  },
+  {
+    "protocol": "icmp",
+    "count": 524
+  },
+  {
+    "protocol": "any",
+    "count": 411
+  },
+  {
+    "protocol": "gre",
+    "count": 324
+  },
+  {
+    "protocol": "rsvp",
+    "count": 274
+  },
+  {
+    "protocol": "ipv6",
+    "count": 272
+  },
+  {
+    "protocol": "sun-nd",
+    "count": 262
+  },
+  {
+    "protocol": "swipe",
+    "count": 262
+  },
+  {
+    "protocol": "mobile",
+    "count": 262
+  },
+  {
+    "protocol": "pim",
+    "count": 262
+  }
+]

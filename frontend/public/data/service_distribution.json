@@ -1,0 +1,54 @@
+[
+  {
+    "service": "unknown",
+    "count": 1246397
+  },
+  {
+    "service": "dns",
+    "count": 781668
+  },
+  {
+    "service": "http",
+    "count": 206273
+  },
+  {
+    "service": "ftp-data",
+    "count": 125783
+  },
+  {
+    "service": "smtp",
+    "count": 81645
+  },
+  {
+    "service": "ftp",
+    "count": 49090
+  },
+  {
+    "service": "ssh",
+    "count": 47160
+  },
+  {
+    "service": "pop3",
+    "count": 1533
+  },
+  {
+    "service": "dhcp",
+    "count": 172
+  },
+  {
+    "service": "ssl",
+    "count": 142
+  },
+  {
+    "service": "snmp",
+    "count": 113
+  },
+  {
+    "service": "radius",
+    "count": 40
+  },
+  {
+    "service": "irc",
+    "count": 31
+  }
+]
