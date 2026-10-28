@@ -128,6 +128,21 @@ CREATE TABLE fact_network_flow (
     PRIMARY KEY (flow_key, date_key)
 ) PARTITION BY RANGE (date_key);
 
+ALTER TABLE fact_network_flow
+    ADD CONSTRAINT fk_fact_date
+        FOREIGN KEY (date_key) REFERENCES dim_date(date_key),
+    ADD CONSTRAINT fk_fact_time
+        FOREIGN KEY (time_key) REFERENCES dim_time(time_key),
+    ADD CONSTRAINT fk_fact_source_host
+        FOREIGN KEY (source_host_key) REFERENCES dim_host(host_key),
+    ADD CONSTRAINT fk_fact_dest_host
+        FOREIGN KEY (dest_host_key) REFERENCES dim_host(host_key),
+    ADD CONSTRAINT fk_fact_protocol
+        FOREIGN KEY (proto_service_key)
+        REFERENCES dim_protocol_service(proto_service_key),
+    ADD CONSTRAINT fk_fact_attack
+        FOREIGN KEY (attack_key) REFERENCES dim_attack_classification(attack_key);
+
 -- Phân vùng cho Đợt 1 (Tháng 1/2015)
 CREATE TABLE fact_network_flow_201501 PARTITION OF fact_network_flow
     FOR VALUES FROM (20150101) TO (20150201);

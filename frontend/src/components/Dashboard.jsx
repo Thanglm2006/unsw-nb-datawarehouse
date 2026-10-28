@@ -7,6 +7,7 @@ import ServiceChart from './ServiceChart'
 import TopIPsTable from './TopIPsTable'
 import AttackByProtocolChart from './AttackByProtocolChart'
 import SampleTable from './SampleTable'
+import FilterPanel from './FilterPanel'
 
 function SectionHeader({ icon, title, subtitle }) {
   return (
@@ -20,7 +21,7 @@ function SectionHeader({ icon, title, subtitle }) {
   )
 }
 
-export default function Dashboard({ data }) {
+export default function Dashboard({ data, filters, options, onFiltersChange, onResetFilters, onPageChange, onSearch, page }) {
   const s = data.summary
 
   return (
@@ -42,6 +43,13 @@ export default function Dashboard({ data }) {
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-8 space-y-10">
+
+        <FilterPanel
+          filters={filters}
+          options={options}
+          onChange={onFiltersChange}
+          onReset={onResetFilters}
+        />
 
         {/* ===== OVERVIEW ===== */}
         <section id="overview" className="scroll-mt-20">
@@ -168,8 +176,14 @@ export default function Dashboard({ data }) {
         {/* ===== DATA TABLE ===== */}
         <section id="data-table" className="scroll-mt-20">
           <div className="glass-card p-6">
-            <SectionHeader icon="📋" title="Bảng dữ liệu mẫu" subtitle="100 bản ghi ngẫu nhiên từ dataset — có tìm kiếm và sắp xếp" />
-            <SampleTable data={data.sample_records} />
+            <SectionHeader icon="📋" title="Tra cứu flow" subtitle="Dữ liệu được lọc và phân trang tại backend" />
+            <SampleTable
+              data={data.sample_records}
+              pagination={data.flow_pagination}
+              page={page}
+              onPageChange={onPageChange}
+              onSearch={onSearch}
+            />
           </div>
         </section>
 

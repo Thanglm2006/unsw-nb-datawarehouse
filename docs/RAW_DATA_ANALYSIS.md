@@ -1,5 +1,7 @@
 # PHÂN TÍCH CHI TIẾT DỮ LIỆU THÔ DATASET UNSW-NB15
 
+> Ghi chú pipeline: các quy tắc làm sạch trong báo cáo này được triển khai trong Pentaho `tr_staging_clean_raw.ktr`. Python không phải dependency của Master Job.
+
 ---
 
 ## 1. TỔNG QUAN TẬP DỮ LIỆU

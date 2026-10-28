@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info><name>tr_staging_clean_raw</name><description>Read and clean the four raw UNSW-NB15 CSV files</description><extended_description/><trans_version/>
+    <trans_type>Normal</trans_type><directory>/unsw</directory><parameters/><log/><maxdate/><size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty><sleep_time_full>50</sleep_time_full><unique_connections>N</unique_connections>
+    <feedback_shown>Y</feedback_shown><feedback_size>50000</feedback_size><using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/><capture_step_performance>N</capture_step_performance>
+  </info>
+  <connection>
+    <name>unsw_dw_postgres</name><server>localhost</server><type>POSTGRESQL</type><access>Native</access>
+    <database>unsw_dw</database><port>5432</port><username>unsw</username><password>unsw_password</password>
+    <servername/><data_tablespace/><index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+    </attributes>
+  </connection>
+  <step>
+    <name>CSV file input</name><type>CsvInput</type><description>Raw files have no header; all fields start as strings</description>
+    <distribute>Y</distribute><custom_distribution/><copies>1</copies><partitioning><method>none</method></partitioning>
+    <filename>${RAW_DATA_DIR}/UNSW-NB15_[1-4].csv</filename><filename_field>source_file</filename_field><rownum_field>source_row_number</rownum_field>
+    <include_filename>Y</include_filename><separator>,</separator><enclosure>&quot;</enclosure><header>N</header>
+    <buffer_size>50000</buffer_size><lazy_conversion>Y</lazy_conversion><add_resultfile>Y</add_resultfile>
+    <parallel>N</parallel><encoding>UTF-8</encoding>
+    <fields>
+      <field><name>raw_srcip</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_sport</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_dstip</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_dsport</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_proto</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_state</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_dur</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_sbytes</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_dbytes</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_sttl</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_dttl</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_sloss</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_dloss</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_service</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_Sload</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_Dload</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_Spkts</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_Dpkts</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_swin</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_dwin</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_stcpb</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_dtcpb</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_smeansz</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_dmeansz</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_trans_depth</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_res_bdy_len</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_Sjit</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_Djit</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_Stime</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_Ltime</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_Sintpkt</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_Dintpkt</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_tcprtt</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_synack</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_ackdat</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_is_sm_ips_ports</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_ct_state_ttl</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_ct_flw_http_mthd</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_is_ftp_login</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_ct_ftp_cmd</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_ct_srv_src</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_ct_srv_dst</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_ct_dst_ltm</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_ct_src_ltm</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_ct_src_dport_ltm</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_ct_dst_sport_ltm</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_ct_dst_src_ltm</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_attack_cat</name><type>String</type><trim_type>both</trim_type></field>
+      <field><name>raw_Label</name><type>String</type><trim_type>both</trim_type></field>
+    </fields>
+    <GUI><xloc>100</xloc><yloc>100</yloc><draw>Y</draw></GUI>
+  </step>
+  <step>
+    <name>Clean and type fields</name><type>ModifiedJavaScriptValue</type><description>Normalize ports, labels, counters, timestamps and dimensions</description>
+    <distribute>Y</distribute><custom_distribution/><copies>1</copies><partitioning><method>none</method></partitioning>
+    <compatible>N</compatible>
+    <script><![CDATA[
+function text(v) {
+  if (v == null) return null;
+  var s = String(v).replace(/^\uFEFF/, "").replace(/^\s+|\s+$/g, "");
+  return (s == "" || s == "null" || s == "undefined") ? null : s;
+}
+function numberValue(v) {
+  var s = text(v);
+  if (s == null) return null;
+  var n = Number(s);
+  return isNaN(n) ? null : n;
+}
+function integerValue(v) {
+  var n = numberValue(v);
+  return n == null ? null : Math.round(n);
+}
+function counterValue(v) {
+  var n = integerValue(v);
+  return n == null ? 0 : n;
+}
+function portValue(v) {
+  var s = text(v);
+  if (s == null || s == "-") return -1;
+  var n;
+  if (s.indexOf("0x") == 0 || s.indexOf("0X") == 0) n = parseInt(s, 16);
+  else n = parseInt(s, 10);
+  return isNaN(n) || n < 0 || n > 65535 ? -1 : n;
+}
+function normalizedService(v) {
+  var s = text(v);
+  return s == null || s == "-" ? "unknown" : s;
+}
+function normalizedAttack(v, labelValue) {
+  var s = text(v);
+  if (labelValue == 0 || s == null) return "Normal";
+  return s == "Backdoors" ? "Backdoor" : s;
+}
+
+srcip = text(raw_srcip); sport = portValue(raw_sport); dstip = text(raw_dstip); dsport = portValue(raw_dsport);
+proto = text(raw_proto); state = text(raw_state); dur = numberValue(raw_dur); sbytes = integerValue(raw_sbytes); dbytes = integerValue(raw_dbytes);
+sttl = integerValue(raw_sttl); dttl = integerValue(raw_dttl); sloss = integerValue(raw_sloss); dloss = integerValue(raw_dloss);
+service = normalizedService(raw_service); sload = numberValue(raw_Sload); dload = numberValue(raw_Dload); spkts = integerValue(raw_Spkts); dpkts = integerValue(raw_Dpkts);
+swin = integerValue(raw_swin); dwin = integerValue(raw_dwin); stcpb = integerValue(raw_stcpb); dtcpb = integerValue(raw_dtcpb);
+smeansz = integerValue(raw_smeansz); dmeansz = integerValue(raw_dmeansz); trans_depth = integerValue(raw_trans_depth); res_bdy_len = integerValue(raw_res_bdy_len);
+sjit = numberValue(raw_Sjit); djit = numberValue(raw_Djit); stime = numberValue(raw_Stime); ltime = numberValue(raw_Ltime);
+start_datetime = stime == null ? null : new Date(stime * 1000); last_datetime = ltime == null ? null : new Date(ltime * 1000);
+date_key = start_datetime == null ? null : start_datetime.getUTCFullYear() * 10000 + (start_datetime.getUTCMonth() + 1) * 100 + start_datetime.getUTCDate();
+time_key = start_datetime == null ? null : start_datetime.getUTCHours() * 10000 + start_datetime.getUTCMinutes() * 100 + start_datetime.getUTCSeconds();
+sinpkt = numberValue(raw_Sintpkt); dinpkt = numberValue(raw_Dintpkt); tcprtt = numberValue(raw_tcprtt); synack = numberValue(raw_synack); ackdat = numberValue(raw_ackdat);
+is_sm_ips_ports = counterValue(raw_is_sm_ips_ports); ct_state_ttl = integerValue(raw_ct_state_ttl); ct_flw_http_mthd = counterValue(raw_ct_flw_http_mthd); is_ftp_login = counterValue(raw_is_ftp_login); ct_ftp_cmd = counterValue(raw_ct_ftp_cmd);
+ct_srv_src = integerValue(raw_ct_srv_src); ct_srv_dst = integerValue(raw_ct_srv_dst); ct_dst_ltm = integerValue(raw_ct_dst_ltm); ct_src_ltm = integerValue(raw_ct_src_ltm);
+ct_src_dport_ltm = integerValue(raw_ct_src_dport_ltm); ct_dst_sport_ltm = integerValue(raw_ct_dst_sport_ltm); ct_dst_src_ltm = integerValue(raw_ct_dst_src_ltm);
+label = integerValue(raw_Label); attack_cat = normalizedAttack(raw_attack_cat, label);
+]]></script>
+    <fields>
+      <field><name>srcip</name><type>String</type><length>64</length><precision>-1</precision></field><field><name>sport</name><type>Integer</type><length>9</length><precision>0</precision></field>
+      <field><name>dstip</name><type>String</type><length>64</length><precision>-1</precision></field><field><name>dsport</name><type>Integer</type><length>9</length><precision>0</precision></field>
+      <field><name>proto</name><type>String</type><length>32</length><precision>-1</precision></field><field><name>state</name><type>String</type><length>32</length><precision>-1</precision></field>
+      <field><name>dur</name><type>Number</type><length>18</length><precision>6</precision></field><field><name>sbytes</name><type>Integer</type><length>18</length><precision>0</precision></field><field><name>dbytes</name><type>Integer</type><length>18</length><precision>0</precision></field>
+      <field><name>sttl</name><type>Integer</type><length>9</length><precision>0</precision></field><field><name>dttl</name><type>Integer</type><length>9</length><precision>0</precision></field><field><name>sloss</name><type>Integer</type><length>9</length><precision>0</precision></field><field><name>dloss</name><type>Integer</type><length>9</length><precision>0</precision></field>
+      <field><name>service</name><type>String</type><length>32</length><precision>-1</precision></field><field><name>sload</name><type>Number</type><length>18</length><precision>6</precision></field><field><name>dload</name><type>Number</type><length>18</length><precision>6</precision></field><field><name>spkts</name><type>Integer</type><length>9</length><precision>0</precision></field><field><name>dpkts</name><type>Integer</type><length>9</length><precision>0</precision></field>
+      <field><name>swin</name><type>Integer</type><length>18</length><precision>0</precision></field><field><name>dwin</name><type>Integer</type><length>18</length><precision>0</precision></field><field><name>stcpb</name><type>Integer</type><length>18</length><precision>0</precision></field><field><name>dtcpb</name><type>Integer</type><length>18</length><precision>0</precision></field><field><name>smeansz</name><type>Integer</type><length>9</length><precision>0</precision></field><field><name>dmeansz</name><type>Integer</type><length>9</length><precision>0</precision></field>
+      <field><name>trans_depth</name><type>Integer</type><length>9</length><precision>0</precision></field><field><name>res_bdy_len</name><type>Integer</type><length>18</length><precision>0</precision></field><field><name>sjit</name><type>Number</type><length>18</length><precision>6</precision></field><field><name>djit</name><type>Number</type><length>18</length><precision>6</precision></field><field><name>stime</name><type>Number</type><length>18</length><precision>6</precision></field><field><name>ltime</name><type>Number</type><length>18</length><precision>6</precision></field>
+      <field><name>start_datetime</name><type>Date</type><length>-1</length><precision>-1</precision></field><field><name>last_datetime</name><type>Date</type><length>-1</length><precision>-1</precision></field><field><name>date_key</name><type>Integer</type><length>9</length><precision>0</precision></field><field><name>time_key</name><type>Integer</type><length>9</length><precision>0</precision></field>
+      <field><name>sinpkt</name><type>Number</type><length>18</length><precision>6</precision></field><field><name>dinpkt</name><type>Number</type><length>18</length><precision>6</precision></field><field><name>tcprtt</name><type>Number</type><length>18</length><precision>6</precision></field><field><name>synack</name><type>Number</type><length>18</length><precision>6</precision></field><field><name>ackdat</name><type>Number</type><length>18</length><precision>6</precision></field>
+      <field><name>is_sm_ips_ports</name><type>Integer</type><length>9</length><precision>0</precision></field><field><name>ct_state_ttl</name><type>Integer</type><length>9</length><precision>0</precision></field><field><name>ct_flw_http_mthd</name><type>Integer</type><length>9</length><precision>0</precision></field><field><name>is_ftp_login</name><type>Integer</type><length>9</length><precision>0</precision></field><field><name>ct_ftp_cmd</name><type>Integer</type><length>9</length><precision>0</precision></field>
+      <field><name>ct_srv_src</name><type>Integer</type><length>9</length><precision>0</precision></field><field><name>ct_srv_dst</name><type>Integer</type><length>9</length><precision>0</precision></field><field><name>ct_dst_ltm</name><type>Integer</type><length>9</length><precision>0</precision></field><field><name>ct_src_ltm</name><type>Integer</type><length>9</length><precision>0</precision></field><field><name>ct_src_dport_ltm</name><type>Integer</type><length>9</length><precision>0</precision></field><field><name>ct_dst_sport_ltm</name><type>Integer</type><length>9</length><precision>0</precision></field><field><name>ct_dst_src_ltm</name><type>Integer</type><length>9</length><precision>0</precision></field>
+      <field><name>attack_cat</name><type>String</type><length>64</length><precision>-1</precision></field><field><name>label</name><type>Integer</type><length>2</length><precision>0</precision></field>
+    </fields>
+    <GUI><xloc>350</xloc><yloc>100</yloc><draw>Y</draw></GUI>
+  </step>
+  <step>
+    <name>Write staging table</name><type>TableOutput</type><description>Write cleaned rows to PostgreSQL staging</description>
+    <distribute>Y</distribute><custom_distribution/><copies>1</copies><partitioning><method>none</method></partitioning>
+    <connection>unsw_dw_postgres</connection><schema/><table>stg_network_flow</table><commit>10000</commit><truncate>N</truncate><ignore_errors>N</ignore_errors><use_batch>Y</use_batch><specify_fields>Y</specify_fields><partitioning_enabled>N</partitioning_enabled>
+    <fields>
+      <field><column_name>srcip</column_name><stream_name>srcip</stream_name></field><field><column_name>sport</column_name><stream_name>sport</stream_name></field><field><column_name>dstip</column_name><stream_name>dstip</stream_name></field><field><column_name>dsport</column_name><stream_name>dsport</stream_name></field><field><column_name>proto</column_name><stream_name>proto</stream_name></field><field><column_name>state</column_name><stream_name>state</stream_name></field><field><column_name>dur</column_name><stream_name>dur</stream_name></field><field><column_name>sbytes</column_name><stream_name>sbytes</stream_name></field><field><column_name>dbytes</column_name><stream_name>dbytes</stream_name></field><field><column_name>sttl</column_name><stream_name>sttl</stream_name></field><field><column_name>dttl</column_name><stream_name>dttl</stream_name></field><field><column_name>sloss</column_name><stream_name>sloss</stream_name></field><field><column_name>dloss</column_name><stream_name>dloss</stream_name></field><field><column_name>service</column_name><stream_name>service</stream_name></field><field><column_name>sload</column_name><stream_name>sload</stream_name></field><field><column_name>dload</column_name><stream_name>dload</stream_name></field><field><column_name>spkts</column_name><stream_name>spkts</stream_name></field><field><column_name>dpkts</column_name><stream_name>dpkts</stream_name></field><field><column_name>swin</column_name><stream_name>swin</stream_name></field><field><column_name>dwin</column_name><stream_name>dwin</stream_name></field><field><column_name>stcpb</column_name><stream_name>stcpb</stream_name></field><field><column_name>dtcpb</column_name><stream_name>dtcpb</stream_name></field><field><column_name>smeansz</column_name><stream_name>smeansz</stream_name></field><field><column_name>dmeansz</column_name><stream_name>dmeansz</stream_name></field><field><column_name>trans_depth</column_name><stream_name>trans_depth</stream_name></field><field><column_name>res_bdy_len</column_name><stream_name>res_bdy_len</stream_name></field><field><column_name>sjit</column_name><stream_name>sjit</stream_name></field><field><column_name>djit</column_name><stream_name>djit</stream_name></field><field><column_name>stime</column_name><stream_name>stime</stream_name></field><field><column_name>ltime</column_name><stream_name>ltime</stream_name></field><field><column_name>start_datetime</column_name><stream_name>start_datetime</stream_name></field><field><column_name>last_datetime</column_name><stream_name>last_datetime</stream_name></field><field><column_name>date_key</column_name><stream_name>date_key</stream_name></field><field><column_name>time_key</column_name><stream_name>time_key</stream_name></field><field><column_name>sinpkt</column_name><stream_name>sinpkt</stream_name></field><field><column_name>dinpkt</column_name><stream_name>dinpkt</stream_name></field><field><column_name>tcprtt</column_name><stream_name>tcprtt</stream_name></field><field><column_name>synack</column_name><stream_name>synack</stream_name></field><field><column_name>ackdat</column_name><stream_name>ackdat</stream_name></field><field><column_name>is_sm_ips_ports</column_name><stream_name>is_sm_ips_ports</stream_name></field><field><column_name>ct_state_ttl</column_name><stream_name>ct_state_ttl</stream_name></field><field><column_name>ct_flw_http_mthd</column_name><stream_name>ct_flw_http_mthd</stream_name></field><field><column_name>is_ftp_login</column_name><stream_name>is_ftp_login</stream_name></field><field><column_name>ct_ftp_cmd</column_name><stream_name>ct_ftp_cmd</stream_name></field><field><column_name>ct_srv_src</column_name><stream_name>ct_srv_src</stream_name></field><field><column_name>ct_srv_dst</column_name><stream_name>ct_srv_dst</stream_name></field><field><column_name>ct_dst_ltm</column_name><stream_name>ct_dst_ltm</stream_name></field><field><column_name>ct_src_ltm</column_name><stream_name>ct_src_ltm</stream_name></field><field><column_name>ct_src_dport_ltm</column_name><stream_name>ct_src_dport_ltm</stream_name></field><field><column_name>ct_dst_sport_ltm</column_name><stream_name>ct_dst_sport_ltm</stream_name></field><field><column_name>ct_dst_src_ltm</column_name><stream_name>ct_dst_src_ltm</stream_name></field><field><column_name>attack_cat</column_name><stream_name>attack_cat</stream_name></field><field><column_name>label</column_name><stream_name>label</stream_name></field>
+    </fields>
+    <GUI><xloc>600</xloc><yloc>100</yloc><draw>Y</draw></GUI>
+  </step>
+  <order>
+    <hop><from>CSV file input</from><to>Clean and type fields</to><enabled>Y</enabled><evaluation>Y</evaluation><unconditional>Y</unconditional></hop>
+    <hop><from>Clean and type fields</from><to>Write staging table</to><enabled>Y</enabled><evaluation>Y</evaluation><unconditional>Y</unconditional></hop>
+  </order>
+  <notepads/><step_error_handling/><slave-step-copy-partition-distribution/>
+  <slave_transformation>N</slave_transformation>
+</transformation>

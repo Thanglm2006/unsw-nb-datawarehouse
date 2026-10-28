@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export default function SampleTable({ data }) {
+export default function SampleTable({ data, pagination, page, onPageChange, onSearch }) {
   const [sortField, setSortField] = useState(null)
   const [sortDir, setSortDir] = useState('asc')
   const [filter, setFilter] = useState('')
@@ -14,21 +14,13 @@ export default function SampleTable({ data }) {
     }
   }
 
-  let filtered = data
-  if (filter) {
-    const q = filter.toLowerCase()
-    filtered = data.filter(row =>
-      Object.values(row).some(v => String(v).toLowerCase().includes(q))
-    )
-  }
-
-  if (sortField) {
-    filtered = [...filtered].sort((a, b) => {
+  const filtered = sortField
+    ? [...data].sort((a, b) => {
       const va = a[sortField], vb = b[sortField]
       if (typeof va === 'number') return sortDir === 'asc' ? va - vb : vb - va
       return sortDir === 'asc' ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va))
     })
-  }
+    : data
 
   const columns = [
     { key: 'srcip', label: 'IP Nguồn' },
@@ -56,12 +48,12 @@ export default function SampleTable({ data }) {
             type="text"
             placeholder="Tìm kiếm IP, giao thức, tấn công..."
             value={filter}
-            onChange={e => setFilter(e.target.value)}
+            onChange={e => { setFilter(e.target.value); onSearch(e.target.value) }}
             className="w-full pl-9 pr-3 py-2 bg-slate-800/60 border border-slate-700/50 rounded-lg text-white text-xs placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all"
           />
         </div>
         <span className="text-[11px] text-slate-500">
-          {filtered.length} / {data.length} bản ghi
+          {pagination?.total?.toLocaleString() || 0} bản ghi
         </span>
       </div>
 
@@ -117,6 +109,13 @@ export default function SampleTable({ data }) {
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+      <div className="flex items-center justify-between mt-3 text-xs text-slate-500">
+        <span>Trang {(page || 0) + 1}</span>
+        <div className="flex gap-2">
+          <button type="button" disabled={!page} onClick={() => onPageChange(page - 1)} className="page-button">Trước</button>
+          <button type="button" disabled={!pagination || (page + 1) * pagination.limit >= pagination.total} onClick={() => onPageChange(page + 1)} className="page-button">Sau</button>
         </div>
       </div>
     </div>

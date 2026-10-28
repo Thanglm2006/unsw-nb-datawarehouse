@@ -3,7 +3,6 @@
 # ==============================================================================
 data/raw/*.csv
 data/processed/*
-!data/processed/.gitkeep
 *.csv.gz
 *.parquet
 *.dump
@@ -44,6 +43,9 @@ env/
 ENV/
 env.bak/
 venv.bak/
+
+# Local environment secrets
+.env
 
 # Testing & Coverage
 .pytest_cache/

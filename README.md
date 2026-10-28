@@ -1,141 +1,148 @@
-# DỰ ÁN KHO DỮ LIỆU AN NINH MẠNG UNSW-NB15 (DATA WAREHOUSE & BACKEND PIPELINE)
+# UNSW-NB15 Data Warehouse
 
-Hệ thống xử lý dữ liệu lớn (Big Data / Data Warehousing) và phát hiện xâm nhập mạng dựa trên dataset chuẩn quốc tế **UNSW-NB15** (2,540,047 bản ghi mạng). Dự án cung cấp quy trình toàn diện từ phân tích dữ liệu thô, module tiền xử lý tự động (Python Preprocessing), mô hình hóa kho dữ liệu hình sao (Kimball Star Schema), và quy trình ETL trên Pentaho Data Integration (PDI).
+Kho dữ liệu phân tích lưu lượng mạng UNSW-NB15 theo mô hình Kimball Star Schema. Pentaho Data Integration (PDI) là thành phần trung tâm của ETL; PostgreSQL lưu trữ; FastAPI cung cấp API; React hiển thị dashboard.
 
----
+## Pipeline chính
 
-## 1. CẤU TRÚC DỰ ÁN (PROJECT DIRECTORY STRUCTURE)
-
-```
-/home/thanglm2006/DW/
-├── data/
-│   ├── raw/                 # Tệp dữ liệu CSV thô (Được Git ignore, không commit)
-│   │   ├── UNSW-NB15_1.csv
-│   │   ├── UNSW-NB15_2.csv
-│   │   ├── UNSW-NB15_3.csv
-│   │   ├── UNSW-NB15_4.csv
-│   │   ├── UNSW_NB15_training-set.csv
-│   │   └── UNSW_NB15_testing-set.csv
-│   ├── metadata/            # Siêu dữ liệu danh mục trường và sự kiện
-│   │   ├── NUSW-NB15_features.csv
-│   │   └── UNSW-NB15_LIST_EVENTS.csv
-│   └── processed/           # Kết quả sau tiền xử lý (Parquet/Cleaned CSV)
-│       └── .gitkeep
-│
-├── docs/                    # Tài liệu kỹ thuật dự án
-│   ├── RAW_DATA_ANALYSIS.md       # Báo cáo phân tích sâu dữ liệu thô
-│   ├── PENTAHO_ETL_PLAN.md        # Kế hoạch & Guide thiết kế Pentaho PDI
-│   ├── PREPROCESSING_PROCESS.md   # Quy trình chi tiết & cách chạy tiền xử lý
-│   ├── before_after_preprocessing.png # Biểu đồ so sánh Trước vs Sau xử lý
-│   └── cleaned_data_overview.png  # Biểu đồ tổng quan đặc tính dữ liệu sạch
-│
-├── pentaho/                 # Các artifacts của Pentaho Data Integration (PDI)
-│   ├── jobs/                # Các file Master Job (*.kjb)
-│   │   └── .gitkeep
-│   └── transformations/     # Các file Transformation (*.ktr)
-│       └── .gitkeep
-│
-├── sql/                     # Kịch bản DDL Cơ sở dữ liệu & Kho dữ liệu
-│   ├── 01_staging_tables.sql      # DDL bảng Staging stg_network_flow
-│   └── 02_star_schema_ddl.sql     # DDL Star Schema (5 Dimension + 1 Partitioned Fact)
-│
-├── src/                     # Mã nguồn Backend & ETL Pipeline
-│   ├── preprocessing/       # Module làm sạch dữ liệu tự động
-│   │   ├── __init__.py
-│   │   ├── cleaner.py       # Pipeline xử lý Hex port, Impute, Datetime, String
-│   │   └── plotter.py       # Module trực quan hóa Before/After & Cleaned Data
-│   └── database/            # Quản lý kết nối Database
-│
-├── tests/                   # Bộ kiểm thử tự động (Unit Tests)
-│   └── test_preprocessing.py
-│
-├── .gitignore               # Cấu hình bỏ qua tệp dữ liệu lớn (>500MB)
-├── requirements.txt         # Khai báo các thư viện phụ thuộc (Dependencies)
-├── RAW_DATA_ANALYSIS.md     # Bản phân tích dữ liệu thô (gốc)
-├── PENTAHO_ETL_PLAN.md      # Kế hoạch ETL Pentaho (gốc)
-├── PREPROCESSING_PROCESS.md # Quy trình tiền xử lý dữ liệu & Hướng dẫn chạy (gốc)
-└── README.md                # Tài liệu tổng quan & Hướng dẫn vận hành
+```text
+4 CSV raw
+  -> Pentaho tr_staging_clean_raw.ktr
+  -> stg_network_flow
+  -> Pentaho tr_load_dimensions.ktr
+  -> Pentaho tr_load_fact_flow.ktr
+  -> Pentaho tr_refresh_analytics.ktr
+  -> FastAPI
+  -> React
 ```
 
----
+Python không nằm trong đường chạy ETL. API có thể chạy bằng Docker; chỉ cần Python nếu chạy FastAPI trực tiếp ngoài Docker.
 
-## 2. HỆ THỐNG TÀI LIỆU CỐT LÕI (DOCUMENTATION)
+## Cấu trúc
 
-1. **[RAW_DATA_ANALYSIS.md](RAW_DATA_ANALYSIS.md)**: Phân tích chi tiết quy mô 2.54M dòng, mất cân bằng nhãn (87.35% Normal vs 12.65% Attack), ô nhiễm kiểu dữ liệu ở cổng (`sport`, `dsport` chứa Hex `0x000b` và `-`), dữ liệu khuyết HTTP/FTP (53% - 56%), và chuỗi nhãn không đồng nhất.
-2. **[PENTAHO_ETL_PLAN.md](PENTAHO_ETL_PLAN.md)**: Thiết kế luồng Master Job (`jb_master_unsw_dw.kjb`) và 3 Transformation tuần tự (`tr_staging_clean_raw.ktr`, `tr_load_dimensions.ktr`, `tr_load_fact_flow.ktr`), kèm cấu hình chi tiết từng Step và phương pháp tối ưu In-memory caching.
-3. **[PREPROCESSING_PROCESS.md](PREPROCESSING_PROCESS.md)**: Quy trình tiền xử lý dữ liệu chi tiết, phân tích kỹ thuật từng bước chuyển đổi và hướng dẫn các cách chạy pipeline và biểu đồ.
+```text
+data/raw/                         # 4 file CSV, không commit vào Git
+data/metadata/                    # metadata 49 trường
+pentaho/jobs/jb_master_unsw_dw.kjb
+pentaho/transformations/
+  tr_check_connection.ktr        # kiểm tra PostgreSQL
+  tr_staging_clean_raw.ktr        # CSV -> staging, làm sạch bằng PDI
+  tr_load_dimensions.ktr         # staging -> dimensions
+  tr_load_fact_flow.ktr          # dimensions -> fact
+  tr_refresh_analytics.ktr       # refresh views + kiểm tra row count
+sql/01_staging_tables.sql
+sql/02_star_schema_ddl.sql
+sql/03_load_dimensions.sql
+sql/04_load_fact.sql
+sql/05_analytical_views.sql
+backend/app.py                   # FastAPI read layer
+frontend/                        # React dashboard
+```
 
----
+## Cài đặt
 
-## 3. HƯỚNG DẪN CLONE REPOSITORY (CLONE REPO)
+1. Docker Engine/Desktop và Docker Compose.
+2. Pentaho Data Integration, gồm Spoon và Kitchen.
+3. Java tương thích với đúng phiên bản PDI. Java 21 chỉ dùng nếu bản PDI đang cài khởi động được với Java 21.
+4. PostgreSQL JDBC driver trong thư mục `data-integration/lib` nếu bản PDI chưa có.
+5. Node.js LTS và npm nếu chạy frontend ngoài Docker.
 
-Để tải toàn bộ mã nguồn dự án về máy:
+Python và `~/venv` chỉ cần nếu chạy API ngoài Docker.
+
+Spoon và Kitchen nằm trong cùng bộ Pentaho Data Integration, không cần tải hai bộ riêng. Spoon dùng để thiết kế/kiểm tra `.ktr` và `.kjb`; Kitchen dùng để chạy `.kjb` bằng command line.
+
+Kiểm tra PDI:
 
 ```bash
-git clone https://github.com/Thanglm2006/unsw-nb-datawarehouse.git
-cd unsw-nb-datawarehouse
+java -version
+spoon.sh
+kitchen.sh -version
 ```
 
----
+## Khởi động PostgreSQL và API
 
-## 4. HƯỚNG DẪN CÀI ĐẶT & CHẠY MODULE TIỀN XỬ LÝ (SETUP & EXECUTION)
-
-### Cài đặt thư viện phụ thuộc:
 ```bash
-pip install -r requirements.txt
+cp .env.example .env
+docker compose up -d postgres api
+docker compose ps
 ```
 
-### Chạy Unit Test kiểm tra tính đúng đắn của bộ lọc:
+Nếu cổng `5432` đã bị chiếm, đổi `POSTGRES_PORT` trong `.env` và dùng cổng đó khi tạo connection PostgreSQL trong Spoon.
+
+Các script trong `docker-entrypoint-initdb.d` chỉ chạy khi volume mới được tạo. Nếu cần khởi tạo lại schema:
+
 ```bash
-python3 -m unittest tests/test_preprocessing.py
+docker compose down -v
+docker compose up -d postgres api
 ```
 
-### Chạy Pipeline làm sạch dữ liệu:
-```bash
-# Sử dụng môi trường ảo venv có sẵn
-~/venv/bin/python -m src.preprocessing.cleaner
-```
-Kết quả được xuất ra định dạng nén Parquet hiệu năng cao tại: `data/processed/unsw_nb15_cleaned.parquet`.
+Không dùng `down -v` nếu cần giữ dữ liệu hiện tại.
 
-### Chạy Module sinh biểu đồ phân tích (Plotter):
-```bash
-~/venv/bin/python -m src.preprocessing.plotter
-```
-Sinh tự động 2 biểu đồ phân tích chất lượng dữ liệu:
-* `docs/before_after_preprocessing.png`: Biểu đồ so sánh Trước vs Sau khi tiền xử lý.
-* `docs/cleaned_data_overview.png`: Biểu đồ phân tích tổng quan đặc tính tập dữ liệu sạch.
+## Chạy Pentaho ETL
 
----
+Đặt raw files tại `data/raw/UNSW-NB15_[1-4].csv` và đặt biến PDI:
 
-## 5. CẤU TRÚC BẢNG ĐÍCH TRONG KHO DỮ LIỆU CHO PENTAHO (TARGET DW SCHEMA)
-
-Pentaho Data Integration (PDI) là công cụ ETL đóng vai trò trích xuất và biến đổi dữ liệu. Dữ liệu sau khi qua Pentaho sẽ được **nạp vào Cơ sở dữ liệu đích (Target Database / Data Warehouse)** thông qua kết nối **JDBC** trong step `Table Output`.
-
-Các kịch bản DDL trong thư mục `sql/` được sử dụng để khởi tạo cấu trúc bảng trên CSDL đích trước khi chạy Pentaho:
-* [sql/01_staging_tables.sql](sql/01_staging_tables.sql): Bảng trung gian `stg_network_flow` (cho Transformation 1).
-* [sql/02_star_schema_ddl.sql](sql/02_star_schema_ddl.sql): Mô hình hình sao 5 bảng Dimension và bảng Fact `fact_network_flow` (cho Transformation 2 & 3).
-
-*(Bạn có thể import các file `.sql` này vào hệ quản trị CSDL đích của bạn như PostgreSQL/MySQL mà Pentaho trỏ tới).*
-
-## 6. CHẠY ETL UNSW-NB15
-
-Khởi động PostgreSQL và database schema:
-
-```bash
-docker compose up -d postgres
+```text
+RAW_DATA_DIR=/absolute/path/to/DW/data/raw
 ```
 
-Sau đó chạy Master ETL:
+Trong Spoon, tạo PostgreSQL connection tới `localhost:5432`, database `unsw_dw`, user `unsw`, password `unsw_password`. Sau khi preview và chạy thử một file nhỏ:
 
 ```bash
-chmod +x pentaho/run_unsw_etl.sh
 ./pentaho/run_unsw_etl.sh
 ```
 
-Script sẽ ưu tiên chạy `jb_master_unsw_dw.kjb` bằng Pentaho Kitchen nếu đã cài PDI. Nếu Pentaho chưa có trong máy, script tự động dùng bước fallback Python + PostgreSQL SQL để hoàn tất cùng pipeline:
+Hoặc:
 
-1. `tr_staging_load_parquet.ktr` / loader Python: nạp Parquet sạch vào staging.
-2. `tr_load_dimensions.ktr` / SQL dimensions: nạp host, protocol, attack, date và time.
-3. `tr_load_fact_flow.ktr` / SQL fact: lookup khóa và nạp 2,540,047 dòng fact.
+```bash
+kitchen.sh -file=/absolute/path/to/DW/pentaho/jobs/jb_master_unsw_dw.kjb -level=Basic
+```
 
-Các transformation và master job Pentaho nằm tại `pentaho/transformations/` và `pentaho/jobs/`.
+Master Job sẽ thất bại nếu số dòng staging và fact không bằng nhau.
+
+## Pentaho xử lý dữ liệu như thế nào
+
+`tr_staging_clean_raw.ktr` gồm ba nhóm step:
+
+1. `CSV file input`: đọc CSV không header, khai báo đủ 49 trường và đọc ban đầu dưới dạng chuỗi để không lỗi ở port Hex hoặc ô rỗng.
+2. `Modified JavaScript Value`: trim chuỗi, chuyển Hex port, gán `-1` cho giá trị không phải port, impute counter, chuẩn hóa `service`/`attack_cat`, chuyển epoch thành datetime và sinh `date_key`/`time_key`.
+3. `Table output`: ghi các field đã ép kiểu vào `stg_network_flow` theo batch 10.000 dòng.
+
+`tr_load_dimensions.ktr` và `tr_load_fact_flow.ktr` chạy SQL set-based. Dimension được tạo trước, sau đó fact lookup surrogate key. `tr_refresh_analytics.ktr` refresh materialized views và kiểm tra `staging_count = fact_count`.
+
+Dòng lỗi không được âm thầm bỏ qua: Table Output đang để chế độ fail-fast. Bảng `stg_network_flow_reject` đã được chuẩn bị để nối error hop khi cần lưu reject thay vì dừng toàn bộ batch.
+
+## Chạy backend và frontend
+
+```bash
+source ~/venv/bin/activate
+pip install -r backend/requirements.txt
+uvicorn backend.app:app --reload --port 8000
+```
+
+Trong terminal khác:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Mở `http://localhost:5173`. Vite proxy `/api` tới `http://localhost:8000`.
+
+## Kiểm tra sau ETL
+
+```bash
+docker compose exec postgres psql -U unsw -d unsw_dw -c "SELECT count(*) AS staging FROM stg_network_flow; SELECT count(*) AS fact FROM fact_network_flow;"
+curl http://localhost:8000/health
+curl http://localhost:8000/api/v1/metrics/overview
+```
+
+## Người vận hành cần tự xác nhận
+
+- PDI và Java tương thích.
+- PostgreSQL connection và CSV preview trong Spoon.
+- Chạy thử một file/sample trước khi chạy 2.54M dòng.
+- Số dòng staging/fact và số dòng reject.
+- Thời gian chạy full ETL.
+
+Các file `.ktr` và `.kjb` đã được lưu sẵn; không cần kéo thả lại mỗi lần chạy.

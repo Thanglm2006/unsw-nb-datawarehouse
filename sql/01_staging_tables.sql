@@ -77,3 +77,18 @@ CREATE INDEX idx_stg_attack ON stg_network_flow (attack_cat, label);
 CREATE INDEX idx_stg_srcip ON stg_network_flow (srcip);
 CREATE INDEX idx_stg_dstip ON stg_network_flow (dstip);
 CREATE INDEX idx_stg_date_time ON stg_network_flow (date_key, time_key);
+
+-- Dòng không đạt quy tắc chất lượng được giữ lại để truy vết, không bị loại âm thầm.
+CREATE TABLE IF NOT EXISTS stg_network_flow_reject (
+    reject_id BIGSERIAL PRIMARY KEY,
+    etl_run_id UUID,
+    source_file VARCHAR(512),
+    source_row_number BIGINT,
+    error_code VARCHAR(64) NOT NULL,
+    error_message TEXT NOT NULL,
+    raw_payload JSONB,
+    rejected_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_stg_reject_run
+    ON stg_network_flow_reject (etl_run_id, rejected_at);

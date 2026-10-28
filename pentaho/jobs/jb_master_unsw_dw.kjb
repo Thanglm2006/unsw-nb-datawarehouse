@@ -25,8 +25,16 @@
       <nr>0</nr><xloc>50</xloc><yloc>100</yloc>
     </entry>
     <entry>
+      <name>Check PostgreSQL</name><type>TRANS</type><specification_method>filename</specification_method>
+      <trans_object_id/><filename>${Internal.Entry.Current.Directory}/../transformations/tr_check_connection.ktr</filename>
+      <transname/><directory_path/><arg_from_previous>N</arg_from_previous><params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row><clear_rows>Y</clear_rows><clear_files>Y</clear_files><set_logfile>N</set_logfile>
+      <logfile/><logext/><add_date>N</add_date><add_time>N</add_time><loglevel>Basic</loglevel>
+      <cluster>N</cluster><slave_server_name/><parallel>N</parallel><draw>Y</draw><nr>0</nr><xloc>125</xloc><yloc>100</yloc>
+    </entry>
+    <entry>
       <name>Load staging</name><type>TRANS</type><specification_method>filename</specification_method>
-      <trans_object_id/><filename>${Internal.Entry.Current.Directory}/../transformations/tr_staging_load_parquet.ktr</filename>
+      <trans_object_id/><filename>${Internal.Entry.Current.Directory}/../transformations/tr_staging_clean_raw.ktr</filename>
       <transname/><directory_path/><arg_from_previous>N</arg_from_previous><params_from_previous>N</params_from_previous>
       <exec_per_row>N</exec_per_row><clear_rows>Y</clear_rows><clear_files>Y</clear_files><set_logfile>N</set_logfile>
       <logfile/><logext/><add_date>N</add_date><add_time>N</add_time><loglevel>Basic</loglevel>
@@ -48,11 +56,21 @@
       <logfile/><logext/><add_date>N</add_date><add_time>N</add_time><loglevel>Basic</loglevel>
       <cluster>N</cluster><slave_server_name/><parallel>N</parallel><draw>Y</draw><nr>0</nr><xloc>500</xloc><yloc>100</yloc>
     </entry>
+    <entry>
+      <name>Refresh analytics and validate</name><type>TRANS</type><specification_method>filename</specification_method>
+      <trans_object_id/><filename>${Internal.Entry.Current.Directory}/../transformations/tr_refresh_analytics.ktr</filename>
+      <transname/><directory_path/><arg_from_previous>N</arg_from_previous><params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row><clear_rows>Y</clear_rows><clear_files>Y</clear_files><set_logfile>N</set_logfile>
+      <logfile/><logext/><add_date>N</add_date><add_time>N</add_time><loglevel>Basic</loglevel>
+      <cluster>N</cluster><slave_server_name/><parallel>N</parallel><draw>Y</draw><nr>0</nr><xloc>650</xloc><yloc>100</yloc>
+    </entry>
   </entries>
   <hops>
-    <hop><from>START</from><to>Load staging</to><from_nr>0</from_nr><to_nr>0</to_nr><enabled>Y</enabled><evaluation>Y</evaluation><unconditional>Y</unconditional></hop>
+    <hop><from>START</from><to>Check PostgreSQL</to><from_nr>0</from_nr><to_nr>0</to_nr><enabled>Y</enabled><evaluation>Y</evaluation><unconditional>Y</unconditional></hop>
+    <hop><from>Check PostgreSQL</from><to>Load staging</to><from_nr>0</from_nr><to_nr>0</to_nr><enabled>Y</enabled><evaluation>Y</evaluation><unconditional>N</unconditional></hop>
     <hop><from>Load staging</from><to>Load dimensions</to><from_nr>0</from_nr><to_nr>0</to_nr><enabled>Y</enabled><evaluation>Y</evaluation><unconditional>N</unconditional></hop>
     <hop><from>Load dimensions</from><to>Load fact</to><from_nr>0</from_nr><to_nr>0</to_nr><enabled>Y</enabled><evaluation>Y</evaluation><unconditional>N</unconditional></hop>
+    <hop><from>Load fact</from><to>Refresh analytics and validate</to><from_nr>0</from_nr><to_nr>0</to_nr><enabled>Y</enabled><evaluation>Y</evaluation><unconditional>N</unconditional></hop>
   </hops>
   <notepads/>
 </job>
