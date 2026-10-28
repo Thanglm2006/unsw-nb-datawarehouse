@@ -54,8 +54,8 @@ Kiểm tra PDI:
 
 ```bash
 java -version
-spoon.sh
-kitchen.sh -version
+spoon || spoon.sh
+kitchen -version || kitchen.sh -version
 ```
 
 ## Khởi động PostgreSQL và API

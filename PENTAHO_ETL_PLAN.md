@@ -114,7 +114,7 @@ Sau khi Spoon đã xác nhận connection và field mapping:
 Hoặc:
 
 ```bash
-kitchen.sh -file=/absolute/path/to/DW/pentaho/jobs/jb_master_unsw_dw.kjb -level=Basic
+kitchen -file=/absolute/path/to/DW/pentaho/jobs/jb_master_unsw_dw.kjb -level=Basic
 ```
 
 Không cần mở Spoon khi chạy production hoặc chạy lại pipeline.
