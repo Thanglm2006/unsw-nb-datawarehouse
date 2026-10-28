@@ -86,12 +86,37 @@ docker compose ps
 Kiểm tra API:
 
 ```bash
-curl http://localhost:8000/health
+curl http://localhost:8009/health
 ```
 
 API phải trả về trạng thái `ok` trước khi chạy ETL.
 
-Nếu cổng PostgreSQL `5432` bị chiếm, sửa `POSTGRES_PORT` trong `.env`. API container vẫn kết nối PostgreSQL qua network Docker.
+Nếu cổng PostgreSQL `5437` bị chiếm, sửa `POSTGRES_PORT` trong `.env`. API container vẫn kết nối PostgreSQL qua network Docker.
+
+## Chạy toàn bộ project bằng một lệnh
+
+Trên Ubuntu, có thể dùng script bootstrap:
+
+```bash
+chmod +x run_project.sh stop_project.sh
+./run_project.sh
+```
+
+Script sẽ kiểm tra raw files, khởi động PostgreSQL/API, chờ API healthy, chạy DuckDB ETL, cài frontend dependencies nếu thiếu và mở Vite.
+
+Các cổng mặc định:
+
+```text
+PostgreSQL: localhost:5437
+API:        http://localhost:8009
+Frontend:   http://localhost:5175
+```
+
+Dừng Docker services:
+
+```bash
+./stop_project.sh
+```
 
 ## Chạy ETL bằng Docker
 
@@ -105,7 +130,7 @@ Service ETL đọc `data/raw` ở chế độ read-only, dùng DuckDB làm sạc
 
 ```bash
 docker compose exec postgres psql -U unsw -d unsw_dw -c "SELECT count(*) AS staging FROM stg_network_flow; SELECT count(*) AS fact FROM fact_network_flow;"
-curl http://localhost:8000/api/v1/etl/status
+curl http://localhost:8009/api/v1/etl/status
 ```
 
 ## Chạy ETL ngoài Docker
@@ -141,7 +166,7 @@ npm install
 npm run dev
 ```
 
-Mở `http://localhost:5173`.
+Mở `http://localhost:5175`.
 
 API base URL cấu hình tại `frontend/.env`:
 
@@ -149,7 +174,7 @@ API base URL cấu hình tại `frontend/.env`:
 VITE_API_BASE_URL=
 ```
 
-Khi chạy local, để trống để Vite proxy tới `http://localhost:8000`. Khi deploy khác domain, đặt URL API tương ứng.
+Khi chạy local, để trống để Vite proxy tới `http://localhost:8009`. Khi deploy khác domain, đặt URL API tương ứng.
 
 Frontend gồm:
 

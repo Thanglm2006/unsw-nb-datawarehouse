@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: unsw
       POSTGRES_PASSWORD: unsw_password
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${POSTGRES_PORT:-5437}:5432"
     volumes:
       - unsw-postgres-data:/var/lib/postgresql/data
       - ./sql/01_staging_tables.sql:/docker-entrypoint-initdb.d/01_staging_tables.sql:ro
@@ -24,9 +24,9 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_URL: postgresql://unsw:unsw_password@postgres:5432/unsw_dw
-      FRONTEND_ORIGINS: http://localhost:5173
+      FRONTEND_ORIGINS: ${FRONTEND_ORIGIN:-http://localhost:5175}
     ports:
-      - "8000:8000"
+      - "${BACKEND_PORT:-8009}:8000"
     depends_on:
       postgres:
         condition: service_healthy

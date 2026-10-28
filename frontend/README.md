@@ -27,7 +27,7 @@ npm install
 npm run dev
 ```
 
-Mở `http://localhost:5173`.
+Mở `http://localhost:5175`.
 
 ## Cấu hình API
 
