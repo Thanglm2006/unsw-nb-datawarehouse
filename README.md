@@ -188,6 +188,8 @@ Backend:  https://dw-api.caelestial.store
 
 `FRONTEND_ORIGINS` đã cho phép cả `http://localhost:5175` và `https://dw.caelestial.store` để dùng được local lẫn tunnel.
 
+Lưu ý: `.env` là file local bị Git ignore. Nếu file đã tồn tại từ trước, Compose vẫn tự append domain tunnel khi tạo API container.
+
 Tunnel phải route đúng:
 
 ```text
