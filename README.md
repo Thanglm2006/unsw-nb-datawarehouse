@@ -116,3 +116,26 @@ Các kịch bản DDL trong thư mục `sql/` được sử dụng để khởi 
 * [sql/02_star_schema_ddl.sql](sql/02_star_schema_ddl.sql): Mô hình hình sao 5 bảng Dimension và bảng Fact `fact_network_flow` (cho Transformation 2 & 3).
 
 *(Bạn có thể import các file `.sql` này vào hệ quản trị CSDL đích của bạn như PostgreSQL/MySQL mà Pentaho trỏ tới).*
+
+## 6. CHẠY ETL UNSW-NB15
+
+Khởi động PostgreSQL và database schema:
+
+```bash
+docker compose up -d postgres
+```
+
+Sau đó chạy Master ETL:
+
+```bash
+chmod +x pentaho/run_unsw_etl.sh
+./pentaho/run_unsw_etl.sh
+```
+
+Script sẽ ưu tiên chạy `jb_master_unsw_dw.kjb` bằng Pentaho Kitchen nếu đã cài PDI. Nếu Pentaho chưa có trong máy, script tự động dùng bước fallback Python + PostgreSQL SQL để hoàn tất cùng pipeline:
+
+1. `tr_staging_load_parquet.ktr` / loader Python: nạp Parquet sạch vào staging.
+2. `tr_load_dimensions.ktr` / SQL dimensions: nạp host, protocol, attack, date và time.
+3. `tr_load_fact_flow.ktr` / SQL fact: lookup khóa và nạp 2,540,047 dòng fact.
+
+Các transformation và master job Pentaho nằm tại `pentaho/transformations/` và `pentaho/jobs/`.

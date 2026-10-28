@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: unsw-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: unsw_dw
+      POSTGRES_USER: unsw
+      POSTGRES_PASSWORD: unsw_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - unsw-postgres-data:/var/lib/postgresql/data
+      - ./sql/01_staging_tables.sql:/docker-entrypoint-initdb.d/01_staging_tables.sql:ro
+      - ./sql/02_star_schema_ddl.sql:/docker-entrypoint-initdb.d/02_star_schema_ddl.sql:ro
+
+volumes:
+  unsw-postgres-data:

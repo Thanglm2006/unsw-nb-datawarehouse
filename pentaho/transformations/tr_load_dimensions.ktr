@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info><name>tr_load_dimensions</name><description>UNSW-NB15 warehouse ETL</description><extended_description/><trans_version/>
+    <trans_type>Normal</trans_type><directory>/unsw</directory><parameters/><log/><maxdate/><size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty><sleep_time_full>50</sleep_time_full><unique_connections>N</unique_connections>
+    <feedback_shown>Y</feedback_shown><feedback_size>50000</feedback_size><using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/><capture_step_performance>N</capture_step_performance>
+  </info>
+      <connection>
+        <name>unsw_dw_postgres</name>
+        <server>localhost</server>
+        <type>POSTGRESQL</type>
+        <access>Native</access>
+        <database>unsw_dw</database>
+        <port>5432</port>
+        <username>unsw</username>
+        <password>unsw_password</password>
+        <servername/>
+        <data_tablespace/>
+        <index_tablespace/>
+        <attributes>
+          <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+          <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+          <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+          <attribute><code>PORT_NUMBER</code><attribute>5432</attribute></attribute>
+          <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>Y</attribute></attribute>
+          <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+          <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+          <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+          <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+        </attributes>
+      </connection>
+  <step>
+    <name>Execute warehouse SQL</name><type>ExecSQL</type><description>Execute staged-to-warehouse load SQL</description>
+    <distribute>Y</distribute><custom_distribution/><copies>1</copies>
+    <partitioning><method>none</method></partitioning>
+    <connection>unsw_dw_postgres</connection><execute_each_row>N</execute_each_row><single_statement>N</single_statement>
+    <replace_variables>Y</replace_variables><quoteString>N</quoteString><sql>BEGIN;
+
+TRUNCATE TABLE dim_host, dim_protocol_service, dim_attack_classification,
+    dim_date, dim_time RESTART IDENTITY CASCADE;
+
+INSERT INTO dim_host (ip_address, subnet_prefix, is_internal_network, ip_class)
+SELECT ip_address,
+       split_part(ip_address, '.', 1) || '.' || split_part(ip_address, '.', 2) AS subnet_prefix,
+       ip_address LIKE '59.166%' OR ip_address LIKE '149.171%' AS is_internal_network,
+       CASE
+           WHEN split_part(ip_address, '.', 1)::integer BETWEEN 1 AND 126 THEN 'A'
+           WHEN split_part(ip_address, '.', 1)::integer BETWEEN 128 AND 191 THEN 'B'
+           ELSE 'Other'
+       END AS ip_class
+FROM (
+    SELECT srcip AS ip_address FROM stg_network_flow
+    UNION
+    SELECT dstip AS ip_address FROM stg_network_flow
+) hosts
+WHERE ip_address IS NOT NULL
+ORDER BY ip_address;
+
+INSERT INTO dim_protocol_service (protocol_name, service_name, state_name)
+SELECT DISTINCT proto, service, state
+FROM stg_network_flow
+ORDER BY proto, service, state;
+
+INSERT INTO dim_attack_classification
+    (attack_category, is_attack_label, threat_severity)
+SELECT categories.attack_category,
+       categories.is_attack_label,
+       CASE categories.is_attack_label WHEN 0 THEN 'None' ELSE 'Medium' END
+FROM (
+    SELECT DISTINCT attack_cat AS attack_category, label AS is_attack_label
+    FROM stg_network_flow
+) categories
+ORDER BY categories.is_attack_label, categories.attack_category;
+
+INSERT INTO dim_date
+    (date_key, full_date, year, quarter, month, month_name, day,
+     day_of_week, day_name, is_weekend)
+SELECT to_char(d, 'YYYYMMDD')::integer,
+       d::date,
+       extract(year FROM d)::smallint,
+       extract(quarter FROM d)::smallint,
+       extract(month FROM d)::smallint,
+       to_char(d, 'FMMonth'),
+       extract(day FROM d)::smallint,
+       extract(isodow FROM d)::smallint,
+       to_char(d, 'FMDay'),
+       extract(isodow FROM d) IN (6, 7)
+FROM generate_series('2010-01-01'::date, '2030-12-31'::date, '1 day') d;
+
+INSERT INTO dim_time
+    (time_key, hour, minute, second, time_of_day_bucket, is_business_hours)
+SELECT hour * 10000 + minute * 100 + second,
+       hour,
+       minute,
+       second,
+       CASE
+           WHEN hour &lt; 6 THEN 'Night'
+           WHEN hour &lt; 12 THEN 'Morning'
+           WHEN hour &lt; 18 THEN 'Afternoon'
+           ELSE 'Evening'
+       END,
+       hour BETWEEN 9 AND 17
+FROM generate_series(0, 23) AS hours(hour),
+     generate_series(0, 59) AS minutes(minute),
+     generate_series(0, 59) AS seconds(second);
+
+COMMIT;
+</sql><set_params>N</set_params>
+    <insert_field/><update_field/><delete_field/><read_field/><cluster_schema/>
+    <GUI><xloc>300</xloc><yloc>100</yloc><draw>Y</draw></GUI>
+  </step>
+  <order/><notepads/><step_error_handling/><slave-step-copy-partition-distribution/>
+  <slave_transformation>N</slave_transformation>
+</transformation>
