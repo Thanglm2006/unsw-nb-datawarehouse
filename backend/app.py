@@ -1,5 +1,6 @@
 """FastAPI read layer for the UNSW-NB15 warehouse."""
 
+import json
 import os
 from datetime import date
 from typing import Any
@@ -332,6 +333,12 @@ async def etl_status() -> dict[str, Any]:
         LIMIT 1
         """
     )
+    latest_run = latest[0] if latest else None
+    if latest_run and isinstance(latest_run.get("quality"), str):
+        try:
+            latest_run["quality"] = json.loads(latest_run["quality"])
+        except json.JSONDecodeError:
+            pass
     counts = await fetch_one(
         """
         SELECT (SELECT count(*) FROM stg_network_flow) AS staging_rows,
@@ -342,12 +349,12 @@ async def etl_status() -> dict[str, Any]:
                (SELECT count(*) FROM stg_network_flow_reject) AS rejected_rows
         """
     )
-    return {"latest": latest[0] if latest else None, "counts": counts}
+    return {"latest": latest_run, "counts": counts}
 
 
 @app.get("/api/v1/etl/runs")
 async def etl_runs(limit: int = Query(20, ge=1, le=100)) -> list[dict[str, Any]]:
-    return await fetch_all(
+    rows = await fetch_all(
         """
         SELECT run_id, started_at, finished_at, status, source_rows,
                staging_rows, fact_rows, rejected_rows, quality, message
@@ -357,6 +364,13 @@ async def etl_runs(limit: int = Query(20, ge=1, le=100)) -> list[dict[str, Any]]
         """,
         limit,
     )
+    for row in rows:
+        if isinstance(row.get("quality"), str):
+            try:
+                row["quality"] = json.loads(row["quality"])
+            except json.JSONDecodeError:
+                pass
+    return rows
 
 
 @app.get("/api/v1/metrics/traffic")

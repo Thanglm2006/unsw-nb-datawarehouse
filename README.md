@@ -102,7 +102,7 @@ chmod +x run_project.sh stop_project.sh
 ./run_project.sh
 ```
 
-Script sẽ kiểm tra raw files, khởi động PostgreSQL/API, chờ API healthy, chạy DuckDB ETL, cài frontend dependencies nếu thiếu và mở Vite.
+Script sẽ kiểm tra raw files, khởi động PostgreSQL/API, chờ API healthy, cài frontend dependencies nếu thiếu, mở Vite ngay và chạy DuckDB ETL trong container song song. Dashboard có thể mở trong lúc ETL đang chạy; trang ETL hiển thị trạng thái audit.
 
 Các cổng mặc định:
 
@@ -123,10 +123,13 @@ Dừng Docker services:
 Đây là cách khuyến nghị:
 
 ```bash
-docker compose run --rm etl
+docker compose run --build etl
+docker compose rm -f etl
 ```
 
 Service ETL đọc `data/raw` ở chế độ read-only, dùng DuckDB làm sạch và nạp PostgreSQL. Sau khi chạy xong, kiểm tra:
+
+ETL in progress theo từng phase và elapsed time; bước fact có thể mất vài phút vì PostgreSQL phải nạp 2.54M dòng vào bảng partitioned và các index.
 
 ```bash
 docker compose exec postgres psql -U unsw -d unsw_dw -c "SELECT count(*) AS staging FROM stg_network_flow; SELECT count(*) AS fact FROM fact_network_flow;"

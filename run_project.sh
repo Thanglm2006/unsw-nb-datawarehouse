@@ -52,9 +52,6 @@ for attempt in {1..30}; do
     sleep 2
 done
 
-echo "Running DuckDB ETL..."
-docker compose run --rm etl
-
 if [[ ! -x frontend/node_modules/.bin/vite ]]; then
     echo "Installing frontend dependencies..."
     (cd frontend && npm install)
@@ -62,7 +59,23 @@ fi
 
 echo "Frontend: http://localhost:${FRONTEND_PORT}"
 echo "API:      http://localhost:${BACKEND_PORT}"
-echo "Press Ctrl+C to stop the frontend. Use ./stop_project.sh to stop Docker services."
-cd frontend
-exec npm run dev -- --host 0.0.0.0 --port "$FRONTEND_PORT"
 
+echo "Starting frontend before ETL..."
+(
+    cd frontend
+    npm run dev -- --host 0.0.0.0 --port "$FRONTEND_PORT"
+) &
+FRONTEND_PID=$!
+
+cleanup() {
+    kill "$FRONTEND_PID" 2>/dev/null || true
+}
+trap cleanup EXIT INT TERM
+
+echo "Running DuckDB ETL in the background container..."
+docker compose run --build etl
+docker compose rm -f etl >/dev/null 2>&1 || true
+
+echo "ETL completed. Press Ctrl+C to stop the frontend. Use ./stop_project.sh to stop Docker services."
+cd frontend
+wait "$FRONTEND_PID"

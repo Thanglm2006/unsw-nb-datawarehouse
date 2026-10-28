@@ -12,7 +12,7 @@ export async function loadDashboard(filters, page, search) {
     attack_category: filters.attack_category,
   }
   const flowParams = { ...common, q: search, limit: 50, offset: page * 50 }
-  const [summary, attacks, dates, hours, protocols, services, sourceIps, destIps, attackProtocols, flows, traffic, protocolVolume, ports, durations] = await Promise.all([
+  const [summary, attacks, dates, hours, protocols, services, sourceIps, destIps, attackProtocols, flows, traffic, ports, durations] = await Promise.all([
     apiGet('/api/v1/metrics/overview', common),
     apiGet('/api/v1/attacks/distribution', common),
     apiGet('/api/v1/traffic/timeseries', common),
@@ -24,7 +24,6 @@ export async function loadDashboard(filters, page, search) {
     apiGet('/api/v1/attacks/by-protocol', common),
     apiGet('/api/v1/flows/search', flowParams),
     apiGet('/api/v1/metrics/traffic', common),
-    apiGet('/api/v1/metrics/protocol-volume', common),
     apiGet('/api/v1/metrics/ports', common),
     apiGet('/api/v1/metrics/duration-buckets', common),
   ])
@@ -42,7 +41,6 @@ export async function loadDashboard(filters, page, search) {
     sample_records: flows.items.map(row => ({ ...row, Label: row.label })),
     flow_pagination: flows,
     traffic,
-    protocol_volume: protocolVolume,
     ports,
     durations,
   }

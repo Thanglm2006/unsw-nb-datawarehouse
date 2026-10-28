@@ -8,6 +8,9 @@ export const apiClient = axios.create({
 })
 
 export async function apiGet(path, params = {}) {
-  const { data } = await apiClient.get(path, { params })
+  const cleanParams = Object.fromEntries(
+    Object.entries(params).filter(([, value]) => value !== '' && value !== null && value !== undefined),
+  )
+  const { data } = await apiClient.get(path, { params: cleanParams })
   return data
 }

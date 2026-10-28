@@ -1,9 +1,10 @@
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: '◈' },
   { id: 'etl', label: 'ETL & Data Quality', icon: '⇄' },
+  { id: 'guide', label: 'ETL Design Guide', icon: '▤' },
 ]
 
-export default function AppShell({ page, onNavigate, summary, children }) {
+export default function AppShell({ page, onNavigate, children }) {
   return (
     <div className="min-h-screen bg-[#0a0e1a] text-slate-200">
       <aside className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-slate-800 bg-[#0d1224]/95 backdrop-blur-xl">
@@ -28,7 +29,6 @@ export default function AppShell({ page, onNavigate, summary, children }) {
           </div>
         </nav>
         <div className="border-t border-slate-800 p-4 text-xs">
-          <div className="mb-2 flex items-center justify-between"><span className="text-slate-500">Fact rows</span><span className="font-semibold text-cyan-300">{summary?.total_records?.toLocaleString?.() || '—'}</span></div>
           <div className="flex items-center gap-2 text-slate-600"><span className="h-2 w-2 rounded-full bg-emerald-400 pulse-dot" />PostgreSQL DW</div>
         </div>
       </aside>

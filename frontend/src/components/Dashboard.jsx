@@ -8,7 +8,6 @@ import TopIPsTable from './TopIPsTable'
 import AttackByProtocolChart from './AttackByProtocolChart'
 import SampleTable from './SampleTable'
 import FilterPanel from './FilterPanel'
-import ProtocolVolumeChart from './ProtocolVolumeChart'
 import PortRangeChart from './PortRangeChart'
 import DurationChart from './DurationChart'
 import BytesTimelineChart from './BytesTimelineChart'
@@ -57,7 +56,7 @@ export default function Dashboard({ data, filters, options, onFiltersChange, onR
 
         {/* ===== OVERVIEW ===== */}
         <section id="overview" className="scroll-mt-20">
-          <SectionHeader icon="📊" title="Tổng quan hệ thống" subtitle="Số liệu thống kê chính từ 2,540,047 bản ghi mạng" />
+          <SectionHeader icon="📊" title="Tổng quan hệ thống" subtitle={`Số liệu thống kê chính từ ${s.total_records.toLocaleString()} bản ghi mạng`} />
           
           {/* Main stats row */}
           <div className="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -103,10 +102,7 @@ export default function Dashboard({ data, filters, options, onFiltersChange, onR
           </div>
         </section>
 
-        <section className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-          <div className="glass-card p-6"><SectionHeader icon="◌" title="Traffic volume" subtitle="Bytes, packets và duration trên toàn bộ flow đã lọc" /><div className="grid grid-cols-2 gap-3 md:grid-cols-3"><Metric label="Source bytes" value={data.traffic.source_bytes} /><Metric label="Destination bytes" value={data.traffic.dest_bytes} /><Metric label="Source packets" value={data.traffic.source_packets} /><Metric label="Destination packets" value={data.traffic.dest_packets} /><Metric label="Median duration" value={formatDuration(data.traffic.median_duration)} /><Metric label="Max duration" value={formatDuration(data.traffic.max_duration)} /></div></div>
-          <div className="glass-card p-6"><SectionHeader icon="↕" title="Traffic theo protocol" subtitle="So sánh tổng bytes và số flow" /><ProtocolVolumeChart data={data.protocol_volume} /></div>
-        </section>
+        <section className="glass-card p-6"><SectionHeader icon="◌" title="Traffic volume" subtitle="Bytes, packets và duration trên toàn bộ flow đã lọc" /><div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6"><Metric label="Source bytes" value={data.traffic.source_bytes} /><Metric label="Destination bytes" value={data.traffic.dest_bytes} /><Metric label="Source packets" value={data.traffic.source_packets} /><Metric label="Destination packets" value={data.traffic.dest_packets} /><Metric label="Median duration" value={formatDuration(data.traffic.median_duration)} /><Metric label="Max duration" value={formatDuration(data.traffic.max_duration)} /></div></section>
 
         {/* ===== ATTACK BY CATEGORY ===== */}
         <section id="attack-category" className="scroll-mt-20">
