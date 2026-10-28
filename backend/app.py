@@ -23,8 +23,9 @@ app = FastAPI(title="UNSW-NB15 Data Warehouse API", version="1.0.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=FRONTEND_ORIGINS,
+    allow_origin_regex=r"^https://dw\.caelestial\.store$",
     allow_credentials=True,
-    allow_methods=["GET"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 

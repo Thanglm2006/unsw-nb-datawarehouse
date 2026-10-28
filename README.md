@@ -188,6 +188,13 @@ Backend:  https://dw-api.caelestial.store
 
 `FRONTEND_ORIGINS` đã cho phép cả `http://localhost:5175` và `https://dw.caelestial.store` để dùng được local lẫn tunnel.
 
+Tunnel phải route đúng:
+
+```text
+dw.caelestial.store     -> http://localhost:5175
+dw-api.caelestial.store -> http://localhost:8009
+```
+
 Frontend gồm:
 
 - Dashboard: KPI, attack distribution, timeline, hourly profile, protocol/service, port profile, top IP, flow search.
