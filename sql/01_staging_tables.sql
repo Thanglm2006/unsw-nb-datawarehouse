@@ -92,3 +92,19 @@ CREATE TABLE IF NOT EXISTS stg_network_flow_reject (
 
 CREATE INDEX IF NOT EXISTS idx_stg_reject_run
     ON stg_network_flow_reject (etl_run_id, rejected_at);
+
+CREATE TABLE IF NOT EXISTS etl_run_audit (
+    run_id UUID PRIMARY KEY,
+    started_at TIMESTAMPTZ NOT NULL,
+    finished_at TIMESTAMPTZ,
+    status VARCHAR(16) NOT NULL,
+    source_rows BIGINT,
+    staging_rows BIGINT,
+    fact_rows BIGINT,
+    rejected_rows BIGINT DEFAULT 0,
+    quality JSONB,
+    message TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_etl_run_audit_started
+    ON etl_run_audit (started_at DESC);

@@ -31,5 +31,17 @@ services:
       postgres:
         condition: service_healthy
 
+  etl:
+    build:
+      context: .
+      dockerfile: etl/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://unsw:unsw_password@postgres:5432/unsw_dw
+    volumes:
+      - ./data/raw:/data/raw:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   unsw-postgres-data:

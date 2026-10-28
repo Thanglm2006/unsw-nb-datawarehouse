@@ -1,6 +1,6 @@
 # PHÂN TÍCH CHI TIẾT DỮ LIỆU THÔ DATASET UNSW-NB15
 
-> Ghi chú pipeline: các quy tắc làm sạch trong báo cáo này được triển khai trong Pentaho `tr_staging_clean_raw.ktr`. Python không phải dependency của Master Job.
+> Ghi chú pipeline: các quy tắc làm sạch trong báo cáo này được triển khai trong DuckDB SQL tại `etl/clean_staging.sql`. PostgreSQL là Data Warehouse đích.
 
 ---
 

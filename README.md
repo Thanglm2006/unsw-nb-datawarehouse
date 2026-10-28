@@ -1,111 +1,66 @@
 # UNSW-NB15 Data Warehouse
 
-Project xây dựng kho dữ liệu phân tích lưu lượng mạng UNSW-NB15 theo mô hình Kimball Star Schema.
+Kho dữ liệu phân tích lưu lượng mạng UNSW-NB15 theo mô hình Kimball Star Schema.
 
-- Pentaho Data Integration: ETL trung tâm.
+- DuckDB: đọc và làm sạch CSV bằng SQL.
 - PostgreSQL: staging, dimensions, fact và analytical views.
-- FastAPI: REST API đọc dữ liệu.
-- React/Vite: dashboard.
+- FastAPI: REST API và server-side filtering/pagination.
+- React/Vite/Recharts: dashboard và ETL/Data Quality page.
 
-## Kiến trúc
+## Pipeline
 
 ```text
 4 CSV raw
-  -> Pentaho tr_staging_clean_raw.ktr
+  -> DuckDB SQL ETL
   -> PostgreSQL staging
-  -> Pentaho load dimensions
-  -> Pentaho load fact
-  -> Materialized views
+  -> dimensions + fact
+  -> materialized views
   -> FastAPI
-  -> React dashboard
+  -> React
 ```
 
-Pentaho đọc và làm sạch CSV trực tiếp. Python preprocessing và Parquet không còn nằm trong pipeline.
+ETL được triển khai bằng DuckDB SQL và nạp trực tiếp vào PostgreSQL.
+
+## Cấu trúc chính
+
+```text
+etl/
+  run_etl.py              # DuckDB -> PostgreSQL full reload
+  clean_staging.sql       # cleaning rules
+  requirements.txt
+sql/
+  01_staging_tables.sql
+  02_star_schema_ddl.sql
+  03_load_dimensions.sql
+  04_load_fact.sql
+  05_analytical_views.sql
+  06_refresh_analytics.sql
+backend/app.py            # API
+frontend/src/
+  api/                    # API client modules
+  config.js               # API base URL
+  pages/                  # DashboardPage, ETLPage
+  components/             # charts and UI
+```
+
+Chi tiết ETL: [ETL_PLAN.md](ETL_PLAN.md).
 
 ## Yêu cầu
 
 - Docker và Docker Compose.
-- Pentaho Data Integration, gồm Spoon và Kitchen.
-- Java tương thích với phiên bản PDI.
+- Python 3.11+ nếu chạy ETL ngoài Docker.
 - Node.js LTS và npm cho frontend.
-- PostgreSQL JDBC driver nếu bản PDI chưa có sẵn.
+- Python chỉ cần khi chạy ETL ngoài Docker hoặc phát triển backend ngoài Docker.
 
-Spoon và Kitchen nằm trong cùng một bộ PDI:
-
-- Spoon: thiết kế và kiểm tra file `.ktr`, `.kjb`.
-- Kitchen: chạy Master Job bằng command line.
-
-### Arch Linux
-
-`yay` chỉ dùng trên Arch để cài package từ AUR:
+Kiểm tra nhanh:
 
 ```bash
-sudo pacman -Syu
-sudo pacman -S --needed base-devel git
-yay -S pdi-ce
+docker --version
+docker compose version
+python3 --version
+node --version
+npm --version
 ```
-
-Package AUR thường cung cấp hai lệnh:
-
-```bash
-spoon
-kitchen
-```
-
-Kiểm tra:
-
-```bash
-java -version
-spoon
-kitchen -version
-```
-
-Nếu dùng bản ZIP của PDI, tên lệnh có thể là `spoon.sh` và `kitchen.sh`. Script project hỗ trợ cả hai dạng.
-
-### Ubuntu CLI
-
-Ubuntu không có AUR và không dùng được `yay`. Cài các dependency bằng `apt`:
-
-```bash
-sudo apt update
-sudo apt install -y docker.io docker-compose-plugin unzip wget git openjdk-17-jre
-sudo systemctl enable --now docker
-sudo usermod -aG docker "$USER"
-newgrp docker
-```
-
-Nếu máy đã có Java 21, có thể thử dùng Java 21 trước. Java 17 là phương án thay thế nếu PDI không khởi động được.
-
-Tải bản PDI Linux ZIP từ trang phân phối Pentaho, sau đó giải nén bằng CLI:
-
-```bash
-mkdir -p "$HOME/opt"
-PDI_ARCHIVE="$(find "$HOME/Downloads" -maxdepth 1 -type f -name 'pdi-ce-*.zip' -print -quit)"
-test -n "$PDI_ARCHIVE" || { echo "Không tìm thấy file PDI ZIP trong ~/Downloads" >&2; exit 1; }
-unzip "$PDI_ARCHIVE" -d "$HOME/opt"
-find "$HOME/opt" -type f \( -name spoon.sh -o -name kitchen.sh \)
-```
-
-Nếu thư mục sau giải nén là `data-integration`, thêm vào PATH:
-
-```bash
-export PDI_HOME="$HOME/opt/data-integration"
-export PATH="$PDI_HOME:$PATH"
-chmod +x "$PDI_HOME"/*.sh
-echo 'export PDI_HOME="$HOME/opt/data-integration"' >> "$HOME/.bashrc"
-echo 'export PATH="$PDI_HOME:$PATH"' >> "$HOME/.bashrc"
-source "$HOME/.bashrc"
-```
-
-Kiểm tra:
-
-```bash
-java -version
-spoon.sh
-kitchen.sh -version
-```
-
-Nếu PDI được cài ở thư mục khác, thay giá trị `PDI_HOME` tương ứng.
 
 ## Chuẩn bị dữ liệu
 
@@ -118,158 +73,119 @@ data/raw/UNSW-NB15_3.csv
 data/raw/UNSW-NB15_4.csv
 ```
 
-Các file CSV không cần commit vào Git.
+Các file CSV không commit vào Git.
 
 ## Khởi động PostgreSQL và API
 
-Tạo file môi trường local:
-
 ```bash
 cp .env.example .env
-```
-
-Khởi động:
-
-```bash
 docker compose up -d postgres api
 docker compose ps
 ```
 
-API chạy tại:
-
-```text
-http://localhost:8000
-```
-
-Kiểm tra:
+Kiểm tra API:
 
 ```bash
 curl http://localhost:8000/health
 ```
 
-Nếu cổng PostgreSQL `5432` bị chiếm, sửa trong `.env`:
+API phải trả về trạng thái `ok` trước khi chạy ETL.
 
-```env
-POSTGRES_PORT=5433
-```
+Nếu cổng PostgreSQL `5432` bị chiếm, sửa `POSTGRES_PORT` trong `.env`. API container vẫn kết nối PostgreSQL qua network Docker.
 
-Khi đó dùng port `5433` trong connection của Spoon. Không dùng `docker compose down -v` nếu muốn giữ dữ liệu PostgreSQL.
+## Chạy ETL bằng Docker
 
-## Cấu hình và chạy Pentaho
-
-### 1. Tạo connection trong Spoon
-
-Mở Spoon:
+Đây là cách khuyến nghị:
 
 ```bash
-spoon
+docker compose run --rm etl
 ```
 
-Mở transformation:
-
-```text
-pentaho/transformations/tr_staging_clean_raw.ktr
-```
-
-Tạo PostgreSQL connection với:
-
-```text
-Connection name: unsw_dw_postgres
-Host: localhost
-Port: 5432 hoặc giá trị POSTGRES_PORT trong .env
-Database: unsw_dw
-User: unsw
-Password: unsw_password
-```
-
-Đặt biến PDI:
-
-```text
-RAW_DATA_DIR=/absolute/path/to/DW/data/raw
-```
-
-Preview CSV và chạy thử với một file nhỏ trước.
-
-### 2. Chạy toàn bộ ETL
-
-Sau khi connection và field mapping đã được kiểm tra:
+Service ETL đọc `data/raw` ở chế độ read-only, dùng DuckDB làm sạch và nạp PostgreSQL. Sau khi chạy xong, kiểm tra:
 
 ```bash
-export RAW_DATA_DIR="$PWD/data/raw"
-./pentaho/run_unsw_etl.sh
+docker compose exec postgres psql -U unsw -d unsw_dw -c "SELECT count(*) AS staging FROM stg_network_flow; SELECT count(*) AS fact FROM fact_network_flow;"
+curl http://localhost:8000/api/v1/etl/status
 ```
 
-Master Job thực hiện:
-
-```text
-Check PostgreSQL
-  -> Clean/load staging
-  -> Load dimensions
-  -> Load fact
-  -> Refresh analytical views
-  -> Validate staging_count = fact_count
-```
-
-Có thể chạy trực tiếp:
+## Chạy ETL ngoài Docker
 
 ```bash
-kitchen -file="$PWD/pentaho/jobs/jb_master_unsw_dw.kjb" -level=Basic
+source ~/venv/bin/activate
+pip install -r etl/requirements.txt
+python -m etl.run_etl --raw-dir data/raw
 ```
 
-Hoặc với bản ZIP:
+Có thể chạy sample trước:
 
 ```bash
-kitchen.sh -file="$PWD/pentaho/jobs/jb_master_unsw_dw.kjb" -level=Basic
+python -m etl.run_etl --raw-dir data/raw --sample-limit 50000
 ```
+
+Full ETL sẽ:
+
+1. Đọc bốn CSV bằng DuckDB.
+2. Làm sạch và ép kiểu bằng `etl/clean_staging.sql`.
+3. Ghi staging bằng PostgreSQL `COPY`.
+4. Nạp dimensions và fact bằng SQL.
+5. Refresh materialized views.
+6. Ghi trạng thái vào `etl_run_audit`.
+7. Fail nếu source/staging/fact không khớp số dòng.
 
 ## Chạy frontend
 
-Nếu API đang chạy bằng Docker:
-
 ```bash
 cd frontend
+cp .env.example .env
 npm install
 npm run dev
 ```
 
-Mở:
+Mở `http://localhost:5173`.
+
+API base URL cấu hình tại `frontend/.env`:
+
+```env
+VITE_API_BASE_URL=
+```
+
+Khi chạy local, để trống để Vite proxy tới `http://localhost:8000`. Khi deploy khác domain, đặt URL API tương ứng.
+
+Frontend gồm:
+
+- Dashboard: KPI, attack distribution, timeline, hourly profile, protocol/service, port profile, top IP, flow search.
+- ETL & Data Quality: pipeline status, audit history, row counts, reject rows và quality metrics.
+
+## API chính
 
 ```text
-http://localhost:5173
+GET /api/v1/metrics/overview
+GET /api/v1/metrics/traffic
+GET /api/v1/metrics/protocol-volume
+GET /api/v1/metrics/ports
+GET /api/v1/attacks/distribution
+GET /api/v1/traffic/timeseries
+GET /api/v1/flows/search
+GET /api/v1/etl/status
+GET /api/v1/etl/runs
 ```
-
-Frontend gọi API qua Vite proxy:
-
-```text
-/api/v1/metrics/overview
-/api/v1/attacks/distribution
-/api/v1/traffic/timeseries
-/api/v1/flows/search
-```
-
-## Kiểm tra dữ liệu sau ETL
-
-```bash
-docker compose exec postgres psql -U unsw -d unsw_dw -c "SELECT count(*) AS staging FROM stg_network_flow; SELECT count(*) AS fact FROM fact_network_flow;"
-curl http://localhost:8000/api/v1/metrics/overview
-```
-
-Hai số lượng staging và fact phải bằng nhau.
 
 ## Khởi tạo lại database
 
-Các file SQL trong `docker-entrypoint-initdb.d` chỉ chạy khi volume mới được tạo. Nếu cần xóa và tạo lại toàn bộ database:
+Các file trong `docker-entrypoint-initdb.d` chỉ chạy khi volume mới được tạo. Nếu cần reset database:
 
 ```bash
 docker compose down -v
 docker compose up -d postgres api
+docker compose run --rm etl
 ```
 
 Lệnh này xóa dữ liệu PostgreSQL hiện tại.
 
-## Tài liệu chi tiết
+## Kiểm thử
 
-- [Pentaho ETL Plan](PENTAHO_ETL_PLAN.md)
-- [Raw Data Analysis](RAW_DATA_ANALYSIS.md)
-- [Frontend README](frontend/README.md)
-- [Backend API](backend/app.py)
+```bash
+python -m compileall backend etl
+docker compose config
+git diff --check
+```

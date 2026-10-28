@@ -8,6 +8,10 @@ import TopIPsTable from './TopIPsTable'
 import AttackByProtocolChart from './AttackByProtocolChart'
 import SampleTable from './SampleTable'
 import FilterPanel from './FilterPanel'
+import ProtocolVolumeChart from './ProtocolVolumeChart'
+import PortRangeChart from './PortRangeChart'
+import DurationChart from './DurationChart'
+import BytesTimelineChart from './BytesTimelineChart'
 
 function SectionHeader({ icon, title, subtitle }) {
   return (
@@ -56,7 +60,7 @@ export default function Dashboard({ data, filters, options, onFiltersChange, onR
           <SectionHeader icon="📊" title="Tổng quan hệ thống" subtitle="Số liệu thống kê chính từ 2,540,047 bản ghi mạng" />
           
           {/* Main stats row */}
-          <div className="grid grid-cols-4 gap-4 mb-4">
+          <div className="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2 xl:grid-cols-4">
             <StatCard
               title="Tổng bản ghi"
               value={s.total_records.toLocaleString()}
@@ -91,12 +95,17 @@ export default function Dashboard({ data, filters, options, onFiltersChange, onR
           </div>
 
           {/* Secondary stats */}
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
             <MiniStat label="IP nguồn" value={s.unique_source_ips} color="text-blue-400" />
             <MiniStat label="IP đích" value={s.unique_dest_ips} color="text-orange-400" />
             <MiniStat label="Giao thức" value={s.unique_protocols} color="text-indigo-400" />
             <MiniStat label="Dịch vụ" value={s.unique_services} color="text-teal-400" />
           </div>
+        </section>
+
+        <section className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+          <div className="glass-card p-6"><SectionHeader icon="◌" title="Traffic volume" subtitle="Bytes, packets và duration trên toàn bộ flow đã lọc" /><div className="grid grid-cols-2 gap-3 md:grid-cols-3"><Metric label="Source bytes" value={data.traffic.source_bytes} /><Metric label="Destination bytes" value={data.traffic.dest_bytes} /><Metric label="Source packets" value={data.traffic.source_packets} /><Metric label="Destination packets" value={data.traffic.dest_packets} /><Metric label="Median duration" value={formatDuration(data.traffic.median_duration)} /><Metric label="Max duration" value={formatDuration(data.traffic.max_duration)} /></div></div>
+          <div className="glass-card p-6"><SectionHeader icon="↕" title="Traffic theo protocol" subtitle="So sánh tổng bytes và số flow" /><ProtocolVolumeChart data={data.protocol_volume} /></div>
         </section>
 
         {/* ===== ATTACK BY CATEGORY ===== */}
@@ -109,10 +118,7 @@ export default function Dashboard({ data, filters, options, onFiltersChange, onR
 
         {/* ===== TIMELINE ===== */}
         <section id="timeline" className="scroll-mt-20">
-          <div className="glass-card p-6">
-            <SectionHeader icon="📅" title="Lưu lượng mạng theo ngày" subtitle="Phân bố lưu lượng bình thường và tấn công theo từng ngày" />
-            <AttackByDateChart data={data.attack_by_date} />
-          </div>
+          <div className="grid grid-cols-1 gap-5 xl:grid-cols-2"><div className="glass-card p-6"><SectionHeader icon="📅" title="Lưu lượng theo ngày" subtitle="Normal và attack theo date key" /><AttackByDateChart data={data.attack_by_date} /></div><div className="glass-card p-6"><SectionHeader icon="◌" title="Bytes theo ngày" subtitle="Tổng source/destination bytes, đơn vị MB" /><BytesTimelineChart data={data.attack_by_date} /></div></div>
         </section>
 
         {/* ===== HOURLY ===== */}
@@ -143,6 +149,10 @@ export default function Dashboard({ data, filters, options, onFiltersChange, onR
             </div>
           </div>
         </section>
+
+        <section className="glass-card p-6"><SectionHeader icon="⌁" title="Port range profile" subtitle="Phân loại source/destination port: non-port, well-known, registered và dynamic" /><PortRangeChart data={data.ports} /></section>
+
+        <section className="glass-card p-6"><SectionHeader icon="◷" title="Duration distribution" subtitle="Phân bố flow theo độ dài phiên và số flow attack" /><DurationChart data={data.durations} /></section>
 
         {/* ===== ATTACK BY PROTOCOL ===== */}
         <section id="attack-protocol" className="scroll-mt-20">
@@ -205,4 +215,12 @@ function MiniStat({ label, value, color }) {
       <span className={`text-sm font-bold ${color}`}>{value.toLocaleString()}</span>
     </div>
   )
+}
+
+function Metric({ label, value }) {
+  return <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-3"><p className="text-[10px] uppercase tracking-wider text-slate-500">{label}</p><p className="mt-1 text-sm font-bold text-slate-200">{value === null || value === undefined ? '—' : typeof value === 'string' ? value : Number(value).toLocaleString()}</p></div>
+}
+
+function formatDuration(value) {
+  return value === null || value === undefined ? '—' : `${Number(value).toFixed(4)} s`
 }

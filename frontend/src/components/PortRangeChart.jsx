@@ -1,0 +1,5 @@
+import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+
+export default function PortRangeChart({ data }) {
+  return <ResponsiveContainer width="100%" height={300}><BarChart data={data} margin={{ top: 10, right: 10, left: 8, bottom: 5 }}><CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} /><XAxis dataKey="port_range" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={{ stroke: '#1e293b' }} tickLine={false} /><YAxis tick={{ fill: '#64748b', fontSize: 10 }} tickFormatter={v => v >= 1e6 ? `${(v / 1e6).toFixed(1)}M` : v >= 1e3 ? `${(v / 1e3).toFixed(0)}K` : v} axisLine={false} tickLine={false} /><Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', borderRadius: 8 }} formatter={(value, name) => [Number(value).toLocaleString(), name]} /><Legend /><Bar dataKey="source_count" fill="#f97316" name="Source port" radius={[4, 4, 0, 0]} /><Bar dataKey="dest_count" fill="#14b8a6" name="Destination port" radius={[4, 4, 0, 0]} /></BarChart></ResponsiveContainer>
+}

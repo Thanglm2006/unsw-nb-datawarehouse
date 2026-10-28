@@ -1,4 +1,4 @@
--- Analytical layer. Pentaho refreshes these views after loading the fact table.
+-- Analytical layer. The DuckDB ETL refreshes these views after loading the fact table.
 
 DROP MATERIALIZED VIEW IF EXISTS mv_overview CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS mv_attack_distribution CASCADE;

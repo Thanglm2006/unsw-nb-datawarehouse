@@ -15,7 +15,7 @@ const CustomTooltip = ({ active, payload }) => {
 }
 
 const RADIAN = Math.PI / 180
-const renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, protocol, percent }) => {
+const renderLabel = ({ cx, cy, midAngle, outerRadius, protocol, percent }) => {
   if (percent < 0.03) return null
   const radius = outerRadius + 20
   const x = cx + radius * Math.cos(-midAngle * RADIAN)
