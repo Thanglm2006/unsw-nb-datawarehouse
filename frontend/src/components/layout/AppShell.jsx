@@ -1,7 +1,8 @@
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: '◈' },
   { id: 'etl', label: 'ETL & Data Quality', icon: '⇄' },
-  { id: 'guide', label: 'ETL Design Guide', icon: '▤' },
+  { id: 'etl-flow', label: 'ETL Flow', icon: '⇢' },
+  { id: 'schema', label: 'Schema Design', icon: '▤' },
 ]
 
 export default function AppShell({ page, onNavigate, children }) {

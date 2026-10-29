@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import AppShell from './components/layout/AppShell'
 import DashboardPage from './pages/DashboardPage'
 import ETLPage from './pages/ETLPage'
-import ETLGuidePage from './pages/ETLGuidePage'
+import ETLFlowPage from './pages/ETLFlowPage'
+import SchemaDesignPage from './pages/SchemaDesignPage'
 import './index.css'
 
 function App() {
@@ -12,7 +13,7 @@ function App() {
 
   return (
     <AppShell page={page} onNavigate={navigate}>
-      {page === 'etl' ? <ETLPage /> : page === 'guide' ? <ETLGuidePage /> : <DashboardPage />}
+      {page === 'etl' ? <ETLPage /> : page === 'etl-flow' ? <ETLFlowPage /> : page === 'schema' ? <SchemaDesignPage /> : <DashboardPage />}
     </AppShell>
   )
 }
