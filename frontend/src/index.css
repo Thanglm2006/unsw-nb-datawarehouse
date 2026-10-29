@@ -12,6 +12,28 @@
   @apply rounded-md border border-slate-700 px-3 py-1 text-slate-300 disabled:cursor-not-allowed disabled:opacity-40 hover:border-cyan-500/60;
 }
 
+.etl-stage-card {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 12px;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.55);
+}
+.etl-stage-cyan { border-color: rgba(34, 211, 238, 0.32); background: rgba(8, 145, 178, 0.08); }
+.etl-stage-amber { border-color: rgba(251, 191, 36, 0.32); background: rgba(180, 83, 9, 0.08); }
+.etl-stage-violet { border-color: rgba(192, 132, 252, 0.32); background: rgba(126, 34, 206, 0.08); }
+.etl-stage-letter {
+  display: inline-flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.72);
+  color: #f8fafc;
+  font-size: 20px;
+  font-weight: 800;
+}
+
 .schema-diagram {
   position: relative;
   min-height: 590px;

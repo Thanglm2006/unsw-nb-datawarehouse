@@ -4,6 +4,7 @@ import DashboardPage from './pages/DashboardPage'
 import ETLPage from './pages/ETLPage'
 import ETLFlowPage from './pages/ETLFlowPage'
 import SchemaDesignPage from './pages/SchemaDesignPage'
+import DashboardQueryPage from './pages/DashboardQueryPage'
 import './index.css'
 
 function App() {
@@ -13,7 +14,7 @@ function App() {
 
   return (
     <AppShell page={page} onNavigate={navigate}>
-      {page === 'etl' ? <ETLPage /> : page === 'etl-flow' ? <ETLFlowPage /> : page === 'schema' ? <SchemaDesignPage /> : <DashboardPage />}
+      {page === 'etl' ? <ETLPage /> : page === 'etl-flow' ? <ETLFlowPage /> : page === 'schema' ? <SchemaDesignPage /> : page === 'query' ? <DashboardQueryPage /> : <DashboardPage />}
     </AppShell>
   )
 }

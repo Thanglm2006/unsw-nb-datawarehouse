@@ -3,6 +3,7 @@ const navItems = [
   { id: 'etl', label: 'ETL & Data Quality', icon: '⇄' },
   { id: 'etl-flow', label: 'ETL Flow', icon: '⇢' },
   { id: 'schema', label: 'Schema Design', icon: '▤' },
+  { id: 'query', label: 'Dashboard Query', icon: '⌕' },
 ]
 
 export default function AppShell({ page, onNavigate, children }) {
